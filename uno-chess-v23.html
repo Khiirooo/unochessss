@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>UNO Chess</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════════════
+   UNO CHESS  —  CSS v21
+   Responsive • Visual Effects • Big & Beautiful
+═══════════════════════════════════════════════════ */
+:root{
+  --coral:#FF4D6D;--hot-pink:#FF006E;--fuchsia:#C77DFF;
+  --mint:#06D6A0;--sun:#FFBE0B;--sky:#48CAE4;
+  --cream:#FFF5F7;--panel:#FFFFFF;
+  --border:#FFCDD6;--border2:#FFB3C1;
+  --text:#2D0A14;--muted:#B5687A;
+  --cell:clamp(48px,7.8vw,72px);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+@media(max-width:900px){html,body{height:auto;min-height:100%;overflow-y:auto;}}
+body{
+  background:var(--cream);color:var(--text);
+  font-family:'Nunito',sans-serif;
+  display:flex;flex-direction:column;align-items:center;
+  background-image:
+    radial-gradient(ellipse at 10% 15%,rgba(255,77,109,.13) 0%,transparent 40%),
+    radial-gradient(ellipse at 90% 85%,rgba(255,190,11,.13) 0%,transparent 40%),
+    radial-gradient(ellipse at 80% 10%,rgba(6,214,160,.11) 0%,transparent 35%),
+    radial-gradient(ellipse at 20% 90%,rgba(72,202,228,.11) 0%,transparent 35%);
+}
+
+/* ── HEADER ── */
+.header{text-align:center;padding:8px 0 3px;flex-shrink:0;}
+h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2rem,5.5vw,3rem);letter-spacing:6px;
+  background:linear-gradient(120deg,var(--hot-pink),var(--coral),var(--sun),var(--mint),var(--sky));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;
+}
+.subtitle{font-size:.65rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
+.header::after{content:'🌸 ✨ 🌺';font-size:.65rem;display:block;text-align:center;margin-top:2px;opacity:.6;letter-spacing:4px;}
+
+/* ── SCREENS ── */
+#screen-lobby,#screen-game{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;overflow:hidden;}
+#screen-game{display:none;overflow-y:auto;}
+
+/* ══════════════════════════════
+   LOBBY
+══════════════════════════════ */
+.lobby-wrap{
+  width:100%;max-width:540px;
+  display:flex;flex-direction:column;gap:12px;
+  padding:6px 14px 14px;overflow-y:auto;flex:1;
+}
+.lobby-card{
+  background:var(--panel);border:1.5px solid var(--border);
+  border-radius:16px;padding:18px;
+  display:flex;flex-direction:column;gap:12px;
+  box-shadow:0 4px 24px rgba(255,77,109,.09);
+}
+.lobby-title{
+  font-family:'Bebas Neue',sans-serif;font-size:1.25rem;
+  letter-spacing:2px;color:var(--hot-pink);text-align:center;
+}
+
+/* tabs */
+.lobby-tabs{
+  display:flex;gap:0;background:rgba(255,205,214,.25);
+  border-radius:12px;padding:4px;border:1.5px solid var(--border);
+}
+.lobby-tab{
+  flex:1;padding:9px 4px;border:none;border-radius:9px;
+  background:transparent;color:var(--muted);
+  font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:1px;
+  cursor:pointer;transition:all .18s;
+}
+.lobby-tab.active{background:#fff;color:var(--hot-pink);box-shadow:0 2px 10px rgba(255,77,109,.15);}
+.lobby-tab-content{display:none;flex-direction:column;gap:12px;}
+.lobby-tab-content.active{display:flex;}
+
+/* inputs & buttons */
+.lobby-input{
+  background:rgba(255,180,194,.1);border:1.5px solid var(--border2);border-radius:10px;
+  padding:12px 16px;color:var(--text);font-family:'Nunito',sans-serif;font-size:1rem;
+  width:100%;outline:none;transition:border-color .2s;
+}
+.lobby-input:focus{border-color:var(--hot-pink);}
+.lobby-input::placeholder{color:#E8AABB;}
+.lobby-btn{
+  background:linear-gradient(135deg,var(--hot-pink),var(--coral));color:#fff;
+  border:none;border-radius:12px;padding:14px 18px;
+  font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:2px;
+  cursor:pointer;width:100%;
+  transition:transform .1s,box-shadow .15s;
+  box-shadow:0 4px 18px rgba(255,77,109,.35);
+}
+.lobby-btn:hover{transform:translateY(-2px);box-shadow:0 7px 26px rgba(255,77,109,.55);}
+.lobby-btn.danger{background:linear-gradient(135deg,var(--fuchsia),#8B5CF6);box-shadow:0 4px 18px rgba(199,125,255,.35);}
+.lobby-btn.green{background:linear-gradient(135deg,#06D6A0,#048A68);box-shadow:0 4px 18px rgba(6,214,160,.35);}
+.lobby-sep{display:flex;align-items:center;gap:8px;color:var(--border2);font-size:.75rem;}
+.lobby-sep::before,.lobby-sep::after{content:'';flex:1;border-top:1px solid var(--border);}
+.lobby-info{font-size:.72rem;color:var(--muted);text-align:center;line-height:1.6;}
+.room-id-box{background:rgba(255,190,11,.1);border:1px solid rgba(255,190,11,.4);border-radius:9px;padding:9px 14px;font-size:.8rem;color:#A67B00;text-align:center;font-family:'Bebas Neue';letter-spacing:1px;word-break:break-all;}
+.copy-btn{background:rgba(255,190,11,.15);border:1px solid rgba(255,190,11,.4);border-radius:6px;padding:4px 10px;color:#A67B00;cursor:pointer;font-size:.68rem;margin-left:6px;font-family:'Nunito';transition:background .15s;}
+.copy-btn:hover{background:rgba(255,190,11,.3);}
+.conn-status{font-size:.75rem;text-align:center;padding:6px;border-radius:7px;}
+.conn-status.ok{color:#06A060;background:rgba(6,214,160,.1);}
+.conn-status.err{color:var(--hot-pink);background:rgba(255,77,109,.08);}
+.conn-status.wait{color:#A67B00;background:rgba(255,190,11,.1);}
+
+/* play type cards (solo / online) */
+.ptype-grid{display:flex;gap:12px;}
+.ptype-card{
+  flex:1;padding:20px 8px 16px;border:2px solid var(--border);
+  border-radius:14px;background:rgba(255,255,255,.7);
+  cursor:pointer;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:all .2s;user-select:none;
+}
+.ptype-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(255,77,109,.18);}
+.ptype-card.active{border-color:var(--hot-pink);background:rgba(255,0,110,.06);box-shadow:0 0 0 2px var(--hot-pink);}
+.ptype-card.active-online{border-color:#48CAE4;background:rgba(72,202,228,.07);box-shadow:0 0 0 2px #48CAE4;}
+.ptype-icon{font-size:2.2rem;line-height:1;}
+.ptype-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:var(--text);}
+.ptype-tag{font-size:.6rem;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+
+/* team buttons */
+.team-btns{display:flex;gap:10px;}
+.team-btn{
+  flex:1;padding:11px 8px;border:2px solid var(--border);border-radius:10px;
+  background:rgba(255,255,255,.8);color:var(--text);
+  font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;
+  cursor:pointer;transition:all .15s;text-align:center;
+}
+.team-btn.team-w.active,.team-btn.team-w:hover{border-color:#FFBE0B;background:rgba(255,190,11,.12);color:#A67B00;}
+.team-btn.team-b.active,.team-btn.team-b:hover{border-color:var(--hot-pink);background:rgba(255,0,110,.08);color:#C9002E;}
+
+/* options */
+.opt-section-title{font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;color:var(--hot-pink);padding:2px 0;border-bottom:1px solid var(--border);margin-bottom:2px;}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.opt-item{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border:1.5px solid var(--border);border-radius:11px;background:rgba(255,245,248,.7);cursor:pointer;transition:all .15s;user-select:none;}
+.opt-item:hover{border-color:var(--hot-pink);background:rgba(255,77,109,.05);}
+.opt-item.opt-on{border-color:var(--hot-pink);background:rgba(255,77,109,.07);}
+.opt-checkbox{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:#fff;}
+.opt-item.opt-on .opt-checkbox{background:var(--hot-pink);border-color:var(--hot-pink);}
+.opt-item.opt-on .opt-checkbox::after{content:'✓';color:#fff;font-size:.65rem;font-weight:900;}
+.opt-label{font-size:.82rem;font-weight:700;color:var(--text);line-height:1.3;}
+.opt-desc{font-size:.67rem;color:var(--muted);line-height:1.3;margin-top:2px;}
+.opt-select{background:rgba(255,205,214,.15);border:1.5px solid var(--border2);border-radius:9px;padding:7px 11px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.85rem;width:100%;outline:none;cursor:pointer;}
+.opt-row{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text);}
+.opt-row label{flex:1;}
+
+/* online info box */
+.online-info-box{background:rgba(72,202,228,.06);border:1.5px solid rgba(72,202,228,.25);border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:7px;}
+.online-info-title{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:2px;color:#0080A0;}
+.online-info-item{display:flex;gap:8px;font-size:.78rem;line-height:1.55;color:var(--text);}
+
+/* ══════════════════════════════
+   TUTORIEL MODAL OVERLAY
+══════════════════════════════ */
+.tuto-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(45,10,20,.75);backdrop-filter:blur(10px);
+  z-index:500;align-items:center;justify-content:center;padding:16px;
+}
+.tuto-ov.on{display:flex;}
+.tuto-box{
+  background:#fff;border:2.5px solid var(--hot-pink);border-radius:20px;
+  width:100%;max-width:560px;max-height:90vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 12px 60px rgba(255,0,110,.3);
+  animation:tutoIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes tutoIn{0%{transform:scale(.85);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.tuto-header{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 20px 12px;border-bottom:1.5px solid var(--border);
+  flex-shrink:0;
+}
+.tuto-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;color:var(--hot-pink);flex:1;}
+.tuto-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted);padding:4px;border-radius:50%;transition:background .15s;}
+.tuto-close:hover{background:rgba(255,77,109,.1);}
+/* step nav */
+.tuto-steps{display:flex;gap:6px;padding:12px 20px 0;flex-shrink:0;}
+.tuto-step{
+  flex:1;height:4px;border-radius:2px;background:var(--border);
+  transition:background .3s;cursor:pointer;
+}
+.tuto-step.done{background:var(--hot-pink);}
+.tuto-step.active{background:var(--coral);}
+/* content */
+.tuto-content{flex:1;overflow-y:auto;padding:16px 20px;}
+.tuto-page{display:none;flex-direction:column;gap:14px;}
+.tuto-page.active{display:flex;}
+.tuto-page-title{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:2px;color:var(--hot-pink);}
+.tuto-intro{font-size:.92rem;line-height:1.7;color:var(--text);}
+.tuto-intro b{color:var(--hot-pink);}
+/* card showcase */
+.tuto-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;}
+.tuto-card{border-radius:10px;padding:9px 10px;font-size:.75rem;line-height:1.5;border:1.5px solid transparent;}
+.tuto-card b{display:block;font-size:.82rem;margin-bottom:2px;}
+.tc-red{background:rgba(255,77,109,.08);border-color:rgba(255,77,109,.25);}.tc-red b{color:#C9002E;}
+.tc-blue{background:rgba(72,202,228,.08);border-color:rgba(72,202,228,.3);}.tc-blue b{color:#0066CC;}
+.tc-green{background:rgba(6,214,160,.08);border-color:rgba(6,214,160,.3);}.tc-green b{color:#057A54;}
+.tc-yellow{background:rgba(255,190,11,.08);border-color:rgba(255,190,11,.3);}.tc-yellow b{color:#A67B00;}
+.tc-wild{background:rgba(199,125,255,.1);border-color:rgba(199,125,255,.4);}.tc-wild b{color:#7B3FA0;}
+.tc-special{background:rgba(94,96,206,.07);border-color:rgba(94,96,206,.25);}.tc-special b{color:#4A4DB0;}
+/* step list */
+.tuto-steps-list{display:flex;flex-direction:column;gap:10px;}
+.tuto-step-item{display:flex;gap:12px;align-items:flex-start;}
+.tuto-step-num{width:28px;height:28px;border-radius:50%;background:var(--hot-pink);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.tuto-step-txt{flex:1;font-size:.88rem;line-height:1.6;color:var(--text);}
+.tuto-step-txt b{color:var(--hot-pink);}
+/* highlight boxes */
+.tuto-hl{border-radius:10px;padding:10px 13px;font-size:.84rem;line-height:1.65;}
+.tuto-hl b{color:inherit;}
+.tuto-hl-pink{background:rgba(255,0,110,.07);border:1.5px solid rgba(255,0,110,.2);color:#7a0030;}
+.tuto-hl-blue{background:rgba(72,202,228,.07);border:1.5px solid rgba(72,202,228,.25);color:#004d6b;}
+.tuto-hl-green{background:rgba(6,214,160,.07);border:1.5px solid rgba(6,214,160,.25);color:#035c40;}
+.tuto-hl-yellow{background:rgba(255,190,11,.09);border:1.5px solid rgba(255,190,11,.3);color:#7a5500;}
+/* footer nav */
+.tuto-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px 14px;border-top:1.5px solid var(--border);
+  flex-shrink:0;gap:8px;
+}
+.tuto-nav-btn{
+  padding:10px 20px;border:none;border-radius:9px;
+  font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;
+  cursor:pointer;transition:all .15s;
+}
+.tuto-prev{background:rgba(255,205,214,.3);color:var(--muted);}
+.tuto-prev:hover{background:rgba(255,205,214,.6);}
+.tuto-next{background:linear-gradient(135deg,var(--hot-pink),var(--coral));color:#fff;box-shadow:0 3px 12px rgba(255,77,109,.35);}
+.tuto-next:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(255,77,109,.5);}
+.tuto-page-counter{font-size:.75rem;color:var(--muted);}
+
+/* ══════════════════════════════
+   GAME LAYOUT
+══════════════════════════════ */
+.game-root{
+  display:flex;flex:1;width:100%;max-width:1200px;
+  gap:12px;padding:5px 10px 7px;
+  overflow:visible;align-items:flex-start;justify-content:center;
+}
+.board-col{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
+
+/* banners */
+.pbanner{
+  width:100%;border-radius:10px;padding:7px 12px;
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;font-size:.9rem;
+  transition:all .3s;border:2px solid transparent;
+}
+.pbanner.pwhite{background:rgba(255,255,255,.85);border-color:rgba(255,180,194,.4);}
+.pbanner.pblack{background:rgba(255,230,235,.7);border-color:rgba(255,145,163,.2);}
+.pbanner.pactive{border-color:var(--hot-pink)!important;background:rgba(255,77,109,.1)!important;box-shadow:0 0 16px rgba(255,77,109,.25);}
+.pdot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.pdot.w{background:#FFFFFF;border:2px solid #999;box-shadow:0 0 5px rgba(0,0,0,.3);}
+.pdot.b{background:#1A1A1A;box-shadow:0 0 5px rgba(0,0,0,.5);}
+.pname{flex:1;font-size:.8rem;}
+.ptag{font-size:.6rem;background:rgba(255,77,109,.15);color:var(--hot-pink);padding:2px 7px;border-radius:5px;font-family:'Bebas Neue';letter-spacing:1px;}
+.pai-tag{font-size:.6rem;background:rgba(6,214,160,.15);color:#05A878;padding:2px 7px;border-radius:5px;font-family:'Bebas Neue';letter-spacing:1px;}
+
+/* HP pips */
+.hp-bar-wrap{flex-shrink:0;display:flex;align-items:center;gap:3px;}
+.hp-pips{display:flex;gap:2px;}
+.hp-pip{width:8px;height:8px;border-radius:2px;background:var(--border);transition:background .3s;}
+.hp-pip.on{background:#06D6A0;}
+.hp-pip.low{background:#FFBE0B;}
+.hp-pip.crit{background:#FF4D6D;}
+
+/* ── BOARD ── */
+.board{
+  display:grid;grid-template-columns:repeat(8,1fr);
+  background:#7C4A1E;border:9px solid #5C3010;border-radius:4px;
+  overflow:hidden;
+  box-shadow:0 8px 40px rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,220,160,.2);
+}
+.cell{
+  width:var(--cell);height:var(--cell);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;
+  transition:filter .12s;user-select:none;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+.cell.light{background:#F0D9B5;}
+.cell.dark{background:#B58863;}
+.cell.selected{outline:4px solid #F6F669;outline-offset:-4px;z-index:2;}
+.cell.vm::after{content:'';position:absolute;width:33%;height:33%;background:rgba(20,85,30,.7);border-radius:50%;pointer-events:none;z-index:1;}
+.cell.vc{outline:4px solid rgba(20,85,30,.85);outline-offset:-4px;}
+.cell:hover:not(.selected){filter:brightness(1.1);}
+
+/* cell animations */
+.cell.capture-flash{animation:capFlash .5s ease-out;}
+@keyframes capFlash{0%{filter:brightness(2.5) saturate(3);}60%{filter:brightness(1.7) hue-rotate(15deg);}100%{filter:none;}}
+.cell.move-land{animation:moveLand .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes moveLand{0%{transform:scale(1.22);}100%{transform:scale(1);}}
+.cell.spawn-w{animation:spawnW .7s cubic-bezier(.34,1.56,.64,1);}
+.cell.spawn-b{animation:spawnB .7s cubic-bezier(.34,1.56,.64,1);}
+@keyframes spawnW{0%{transform:scale(0);box-shadow:inset 0 0 28px rgba(255,220,150,.95);}100%{transform:scale(1);}}
+@keyframes spawnB{0%{transform:scale(0);box-shadow:inset 0 0 28px rgba(255,77,109,.95);}100%{transform:scale(1);}}
+.glow-w{animation:glowW 3s ease-out forwards;}
+.glow-b{animation:glowB 3s ease-out forwards;}
+@keyframes glowW{0%,40%{box-shadow:inset 0 0 14px rgba(255,190,11,.9),0 0 12px rgba(255,190,11,.5);}100%{box-shadow:none;}}
+@keyframes glowB{0%,40%{box-shadow:inset 0 0 14px rgba(255,77,109,.9),0 0 12px rgba(255,77,109,.5);}100%{box-shadow:none;}}
+/* check/shield */
+.cell.in-check{animation:checkPulse .7s ease-in-out infinite alternate;}
+@keyframes checkPulse{0%{background:rgba(220,50,50,.45);}100%{background:rgba(220,50,50,.8);}}
+.cell.shielded{animation:shieldPulse 1.2s ease-in-out infinite alternate;}
+@keyframes shieldPulse{0%{background:rgba(80,80,220,.25);}100%{background:rgba(80,80,220,.6);}}
+/* zones */
+.cell.zone-boost::before{content:'';position:absolute;inset:0;background:rgba(6,214,160,.22);pointer-events:none;z-index:0;}
+.cell.zone-boost .zone-icon{position:absolute;font-size:.55em;bottom:1px;left:2px;z-index:1;opacity:.8;pointer-events:none;}
+.cell.zone-regen::before{content:'';position:absolute;inset:0;background:rgba(80,200,80,.2);pointer-events:none;z-index:0;}
+.cell.zone-regen .zone-icon{position:absolute;font-size:.55em;bottom:1px;left:2px;z-index:1;opacity:.85;pointer-events:none;}
+
+/* ── PIECES ── */
+.piece{position:relative;z-index:2;line-height:1;font-size:clamp(1.6rem,4.2vw,2.4rem);}
+.piece-w{color:#FFFFF0;filter:drop-shadow(0 1px 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(1px 0 0 #000) drop-shadow(0 -1px 0 #000);}
+.piece-b{color:#1C1C1C;filter:drop-shadow(0 1px 0 rgba(255,255,255,.5)) drop-shadow(-1px 0 0 rgba(255,255,255,.3)) drop-shadow(1px 0 0 rgba(255,255,255,.3));}
+.piece-w.is-new{filter:drop-shadow(0 0 8px #FFE66D) drop-shadow(0 1px 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(1px 0 0 #000);}
+.piece-b.is-new{filter:drop-shadow(0 0 8px #FF4D6D) drop-shadow(0 1px 0 rgba(255,255,255,.5));}
+.piece.frozen::after{content:'❄️';position:absolute;top:-3px;right:-3px;font-size:.4em;z-index:3;}
+
+/* frozen turns badge on cell */
+.frozen-turns-badge{position:absolute;bottom:2px;left:2px;font-size:.35em;z-index:4;background:rgba(72,202,228,.9);color:#003d5c;border-radius:3px;padding:0 3px;font-weight:900;}
+
+/* coords */
+.coord-row{display:flex;gap:0;padding:0 18px;}
+.clbl{width:var(--cell);text-align:center;font-size:.52rem;color:var(--muted);font-weight:700;}
+.coord-col{display:flex;flex-direction:column;}
+.rlbl{height:var(--cell);display:flex;align-items:center;font-size:.52rem;color:var(--muted);font-weight:700;width:18px;}
+.legend{display:flex;gap:9px;align-items:center;justify-content:center;padding:3px 0;flex-wrap:wrap;}
+.leg-i{display:flex;align-items:center;gap:3px;font-size:.65rem;color:var(--muted);}
+.lpw{font-size:1.05rem;color:#FFF;filter:drop-shadow(0 0 1px rgba(0,0,0,.9)) drop-shadow(0 1px 1px rgba(0,0,0,.8));background:rgba(0,0,0,.3);border-radius:3px;padding:0 3px;}
+.lpb{font-size:1.05rem;color:#1A1A1A;filter:drop-shadow(0 0 1px rgba(255,255,255,.4)) drop-shadow(0 1px 1px rgba(0,0,0,.7));background:rgba(255,255,255,.4);border-radius:3px;padding:0 3px;}
+.lsep{color:var(--border);}
+.back-btn{align-self:flex-start;background:rgba(255,255,255,.75);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:.72rem;padding:5px 13px;cursor:pointer;font-family:'Nunito';transition:all .15s;margin-bottom:1px;flex-shrink:0;}
+.back-btn:hover{color:var(--text);border-color:var(--hot-pink);}
+
+/* ── RIGHT PANEL ── */
+.right-panel{
+  display:flex;flex-direction:column;gap:9px;
+  width:260px;flex-shrink:0;overflow-y:auto;
+  padding-right:2px;flex:1;max-width:275px;
+  max-height:calc(100vh - 90px);
+}
+.right-panel::-webkit-scrollbar{width:3px;}
+.right-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.pcard{
+  background:#fff;border:2px solid var(--border2);border-radius:14px;
+  padding:11px 13px;display:flex;flex-direction:column;gap:7px;
+  box-shadow:0 4px 18px rgba(255,77,109,.1),0 1px 0 #fff inset;
+}
+.pcard-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--hot-pink);border-bottom:1px solid var(--border);padding-bottom:5px;}
+.turn-box{border-radius:10px;padding:9px 11px;border:2px solid var(--border);background:rgba(255,232,239,.5);transition:all .35s;display:flex;flex-direction:column;gap:4px;}
+.turn-box.tw{border-color:rgba(255,190,11,.55);background:rgba(255,245,240,.85);}
+.turn-box.tb{border-color:rgba(255,77,109,.45);background:rgba(255,230,235,.65);}
+.trow{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.82rem;}
+.tdot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.tdot.w{background:#FFFFFF;border:2px solid #999;box-shadow:0 0 5px rgba(0,0,0,.3);}
+.tdot.b{background:#1A1A1A;box-shadow:0 0 5px rgba(0,0,0,.5);}
+.mcounter{font-family:'Bebas Neue',sans-serif;font-size:2.7rem;letter-spacing:3px;color:var(--hot-pink);text-align:center;line-height:1;}
+.mlabel{font-size:.7rem;color:var(--muted);text-align:center;letter-spacing:1px;text-transform:uppercase;}
+.status-box{text-align:center;font-weight:700;font-size:.9rem;color:var(--hot-pink);min-height:32px;display:flex;align-items:center;justify-content:center;line-height:1.4;padding:4px;}
+.status-box.pulse{animation:statusPulse .55s ease-out;}
+@keyframes statusPulse{0%{transform:scale(1.06);background:rgba(255,77,109,.08);}100%{transform:scale(1);background:transparent;}}
+
+/* blitz */
+.blitz-row{display:flex;align-items:center;gap:7px;}
+.blitz-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.blitz-bar{height:100%;background:linear-gradient(90deg,var(--mint),var(--sky));border-radius:3px;transition:width .9s linear,background .5s;}
+.blitz-bar.urgent{background:linear-gradient(90deg,var(--coral),var(--hot-pink));}
+.blitz-val{font-family:'Bebas Neue';font-size:.9rem;color:var(--hot-pink);width:24px;text-align:right;flex-shrink:0;}
+
+/* draw/pass btn */
+.draw-btn{background:linear-gradient(135deg,var(--hot-pink),var(--coral));color:#fff;border:none;border-radius:10px;padding:11px 14px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;cursor:pointer;width:100%;transition:transform .1s,box-shadow .15s;box-shadow:0 3px 14px rgba(255,77,109,.3);}
+.draw-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(255,77,109,.55);}
+.draw-btn:disabled{background:#FFD6E0;color:#F0AAB8;box-shadow:none;cursor:not-allowed;transform:none;}
+
+/* card area (last played card) */
+.card-area{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.uno-card{
+  width:82px;height:118px;border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  border:3px solid rgba(255,255,255,.5);
+  box-shadow:0 8px 28px rgba(255,77,109,.3),inset 0 0 16px rgba(255,255,255,.2);
+  position:relative;overflow:hidden;
+  animation:cardIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes cardIn{0%{transform:rotateY(90deg) scale(.8);opacity:0;}100%{transform:none;opacity:1;}}
+.uno-card::before{content:'';position:absolute;width:72%;height:72%;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.25);}
+.cv{font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;position:relative;z-index:1;text-shadow:1px 2px 6px rgba(0,0,0,.3);}
+.cs{font-size:.46rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.9);position:relative;z-index:1;}
+.c-red{background:linear-gradient(135deg,#C9002E,#FF4D6D);}
+.c-blue{background:linear-gradient(135deg,#0066CC,#48CAE4);}
+.c-green{background:linear-gradient(135deg,#007A50,#06D6A0);}
+.c-yellow{background:linear-gradient(135deg,#C87B00,#FFBE0B);}.c-yellow .cs{color:rgba(0,0,0,.6);}
+.c-wild{background:linear-gradient(135deg,var(--hot-pink),var(--fuchsia));border-color:rgba(255,255,255,.5);}
+.c-shield{background:linear-gradient(135deg,#5E60CE,#48CAE4);}
+.c-swap{background:linear-gradient(135deg,#06D6A0,#0099CC);}
+.c-res{background:linear-gradient(135deg,#FFBE0B,#FF8FA3);}
+.c-gel{background:linear-gradient(135deg,#48CAE4,#0066CC);}
+.c-vol{background:linear-gradient(135deg,#C77DFF,#7B3FA0);}
+.c-meteor{background:linear-gradient(135deg,#FF4D6D,#2D0A14);}
+
+/* wild team picker */
+.wild-pick{display:flex;flex-direction:column;gap:6px;width:100%;}
+.wild-pick button{padding:10px;border:none;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;cursor:pointer;color:#fff;transition:transform .12s,box-shadow .12s;box-shadow:0 3px 10px rgba(0,0,0,.15);}
+.wild-pick button:hover{transform:scale(1.04);box-shadow:0 5px 16px rgba(0,0,0,.25);}
+.btn-w{background:linear-gradient(135deg,#FFBE0B,#FF8FA3);color:#1A0008!important;}
+.btn-b{background:linear-gradient(135deg,var(--hot-pink),#C9002E);}
+
+/* color constraint banner */
+.color-constraint{
+  display:flex;align-items:center;gap:8px;
+  border-radius:9px;padding:7px 10px;
+  font-size:.75rem;font-weight:700;border:2px solid;
+  animation:constraintPop .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes constraintPop{0%{transform:scale(.9);opacity:.5;}100%{transform:scale(1);opacity:1;}}
+.color-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor;}
+.cc-red{background:rgba(201,0,46,.07);border-color:rgba(201,0,46,.35);color:#8b001a;}
+.cc-blue{background:rgba(0,102,204,.07);border-color:rgba(0,102,204,.35);color:#003d7a;}
+.cc-green{background:rgba(0,122,80,.07);border-color:rgba(0,122,80,.35);color:#003d28;}
+.cc-yellow{background:rgba(200,123,0,.09);border-color:rgba(200,123,0,.4);color:#7a4700;}
+
+/* hand */
+.hand-area{display:flex;flex-direction:column;gap:6px;}
+.hand-label{font-size:.65rem;color:var(--muted);text-align:center;letter-spacing:1px;text-transform:uppercase;}
+.hand-cards{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.hand-card{
+  width:54px;height:76px;border-radius:10px;
+  border:2px solid rgba(0,0,0,.15);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  position:relative;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
+  user-select:none;flex-shrink:0;-webkit-tap-highlight-color:transparent;
+}
+.hand-card:hover{transform:translateY(-11px) scale(1.13);box-shadow:0 14px 30px rgba(0,0,0,.35);}
+.hand-card:active{transform:translateY(-6px) scale(1.06);}
+.hand-card.selected-card{transform:translateY(-16px) scale(1.15);box-shadow:0 16px 36px rgba(255,77,109,.55);border-color:var(--hot-pink)!important;animation:cardSelect .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes cardSelect{0%{transform:translateY(0) scale(1);}60%{transform:translateY(-20px) scale(1.2);}100%{transform:translateY(-16px) scale(1.15);}}
+.hand-card.unplayable{opacity:.3;cursor:default;filter:grayscale(.6);}
+.hand-card.unplayable:hover{transform:none;box-shadow:none;}
+.hand-card .hcv{font-size:1.15rem;font-weight:900;line-height:1;}
+.hand-card .hcs{font-size:.46rem;letter-spacing:.3px;text-transform:uppercase;opacity:.8;}
+.hand-card.hc-red{background:linear-gradient(135deg,#FF4D6D,#C9002E);color:#fff;}
+.hand-card.hc-blue{background:linear-gradient(135deg,#48CAE4,#0066CC);color:#fff;}
+.hand-card.hc-green{background:linear-gradient(135deg,#06D6A0,#048A68);color:#fff;}
+.hand-card.hc-yellow{background:linear-gradient(135deg,#FFE66D,#FFBE0B);color:#5a3d00;}
+.hand-card.hc-wild{background:linear-gradient(135deg,#C77DFF,#7B3FA0,#FF006E,#FFBE0B);color:#fff;}
+.hand-card.hc-shield{background:linear-gradient(135deg,#5e60CE,#4A4DB0);color:#fff;}
+.hand-card.hc-swap{background:linear-gradient(135deg,#06D6A0,#048A68);color:#fff;}
+.hand-card.hc-res{background:linear-gradient(135deg,#FFBE0B,#A67B00);color:#fff;}
+.hand-card.hc-gel{background:linear-gradient(135deg,#ADE8F4,#48CAE4);color:#003d5c;}
+.hand-card.hc-vol{background:linear-gradient(135deg,#C77DFF,#7B3FA0);color:#fff;}
+.hand-card.hc-meteor{background:linear-gradient(135deg,#FF4D6D,#8B0020);color:#fff;}
+
+/* draw-pass btn in hand area */
+#draw-pass-btn{
+  flex:1;padding:11px;
+  border:1.5px solid var(--border2);border-radius:10px;
+  background:rgba(255,180,194,.15);color:var(--muted);
+  font-family:'Bebas Neue';font-size:1rem;letter-spacing:1px;cursor:pointer;
+  transition:all .15s;
+}
+#draw-pass-btn:hover{background:rgba(255,77,109,.12);border-color:var(--hot-pink);color:var(--hot-pink);}
+
+/* uno button */
+.uno-btn{background:linear-gradient(135deg,#FF006E,#FFBE0B);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:3px;cursor:pointer;width:100%;box-shadow:0 4px 18px rgba(255,0,110,.4);animation:unoflash .6s ease-in-out infinite alternate;transition:transform .1s;}
+.uno-btn:hover{transform:scale(1.05);}
+@keyframes unoflash{0%{box-shadow:0 4px 18px rgba(255,0,110,.4);}100%{box-shadow:0 4px 30px rgba(255,190,11,.85);}}
+.uno-called{background:rgba(255,0,110,.1);border:1.5px solid rgba(255,0,110,.3);border-radius:8px;padding:5px 9px;font-size:.7rem;color:var(--hot-pink);font-weight:700;text-align:center;}
+.stack-badge{background:rgba(255,77,109,.12);border:1.5px solid rgba(255,77,109,.35);border-radius:9px;padding:6px 9px;font-size:.7rem;color:var(--hot-pink);font-weight:700;text-align:center;animation:stackpulse .8s ease-in-out infinite alternate;}
+@keyframes stackpulse{0%{background:rgba(255,77,109,.12);}100%{background:rgba(255,77,109,.28);}}
+
+/* spawn */
+.spawn-ind{border-radius:8px;padding:6px 9px;font-size:.68rem;font-weight:700;display:flex;gap:5px;align-items:center;animation:fadeUp .35s ease;}
+.spawn-ind.si-w{background:rgba(255,190,11,.1);border:1px solid rgba(255,190,11,.3);color:#A67B00;}
+.spawn-ind.si-b{background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.2);color:var(--hot-pink);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+
+/* log */
+.deck-info{text-align:center;font-size:.62rem;color:var(--muted);}
+.log{background:rgba(255,230,235,.5);border:1px solid var(--border);border-radius:8px;padding:6px;font-size:.67rem;max-height:95px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;}
+.log::-webkit-scrollbar{width:2px;}
+.log::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.le{opacity:.85;line-height:1.5;color:var(--text);}
+.le.sp{color:var(--hot-pink);font-weight:700;}
+.le.cap{color:#C9002E;}
+.le.rev{color:#0066CC;}
+.le.pawn{color:#06A060;font-weight:700;}
+.le.pawn-b{color:var(--hot-pink);font-weight:700;}
+.le.dim{color:var(--border2);}
+.le.ai{color:#05A878;font-style:italic;}
+.le.gel{color:#0099CC;font-style:italic;}
+.le.zone{color:#7B3FA0;}
+
+/* captures */
+.captured-box{display:flex;flex-direction:column;gap:5px;}
+.cap-row{display:flex;align-items:center;gap:6px;min-height:22px;}
+.cap-label{font-size:.62rem;color:var(--muted);width:50px;flex-shrink:0;}
+.cap-pieces{display:flex;flex-wrap:wrap;gap:1px;font-size:.92rem;min-height:18px;}
+.cap-score{font-family:'Bebas Neue';font-size:.95rem;color:var(--hot-pink);margin-left:auto;}
+
+/* badges */
+.shield-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(94,96,206,.12);border:1px solid rgba(94,96,206,.3);border-radius:5px;padding:2px 7px;font-size:.6rem;color:#4A4DB0;font-weight:700;}
+.gel-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(72,202,228,.12);border:1px solid rgba(72,202,228,.3);border-radius:5px;padding:2px 7px;font-size:.6rem;color:#0080A0;font-weight:700;}
+.king-shield-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(255,190,11,.12);border:1px solid rgba(255,190,11,.3);border-radius:5px;padding:2px 7px;font-size:.6rem;color:#A67B00;font-weight:700;}
+
+/* AI thinking */
+.ai-thinking{display:none;font-size:.72rem;color:#05A878;text-align:center;font-style:italic;padding:3px;}
+.ai-thinking.on{display:block;}
+.ai-dot{animation:blink 1.2s infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s;}.ai-dot:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.2;}40%{opacity:1;}}
+
+/* modal */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(255,200,210,.65);backdrop-filter:blur(10px);z-index:200;align-items:center;justify-content:center;}
+.modal-ov.on{display:flex;}
+.modal{background:#fff;border:2.5px solid var(--hot-pink);border-radius:16px;padding:26px 22px;text-align:center;max-width:320px;width:90%;animation:cardIn .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 10px 50px rgba(255,77,109,.3);}
+.modal h2{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:var(--hot-pink);margin-bottom:8px;}
+.modal p{color:var(--muted);margin-bottom:18px;font-size:.84rem;line-height:1.65;}
+.modal button{background:linear-gradient(135deg,var(--hot-pink),var(--coral));color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:'Bebas Neue',sans-serif;font-size:.98rem;letter-spacing:2px;cursor:pointer;margin:3px;}
+.modal .btn-back2{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+
+/* pass overlay */
+.pass-ov{display:none;position:fixed;inset:0;background:rgba(255,245,248,.97);backdrop-filter:blur(12px);z-index:160;align-items:center;justify-content:center;flex-direction:column;gap:18px;text-align:center;}
+.pass-ov.on{display:flex;}
+.pass-piece{font-size:4rem;animation:passFloat 2s ease-in-out infinite alternate;}
+@keyframes passFloat{0%{transform:translateY(0) scale(1);}100%{transform:translateY(-10px) scale(1.08);}}
+.pass-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:4px;background:linear-gradient(120deg,var(--hot-pink),var(--coral),var(--sun));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.pass-sub{color:var(--muted);font-size:.9rem;max-width:280px;line-height:1.6;padding:0 16px;}
+.pass-btn{background:linear-gradient(135deg,var(--hot-pink),var(--coral));color:#fff;border:none;border-radius:14px;padding:16px 36px;font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:3px;cursor:pointer;box-shadow:0 6px 24px rgba(255,77,109,.45);transition:transform .1s,box-shadow .15s;}
+.pass-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(255,77,109,.65);}
+.pass-btn:active{transform:translateY(0);}
+
+/* wait overlay */
+.wait-ov{display:none;position:fixed;inset:0;background:rgba(255,245,248,.93);z-index:150;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.wait-ov.on{display:flex;}
+.wait-spin{width:46px;height:46px;border:3.5px solid var(--border);border-top-color:var(--hot-pink);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.wait-msg{font-family:'Bebas Neue';font-size:1.3rem;letter-spacing:2px;color:var(--hot-pink);}
+
+/* confetti */
+.confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;z-index:250;pointer-events:none;animation:confettiFall 2.5s ease-in forwards;}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(100vh) rotate(720deg);}}
+
+/* challenge / survival (keep for JS compat) */
+.challenge-box{display:flex;flex-direction:column;gap:5px;}
+.challenge-item{display:flex;align-items:center;gap:6px;font-size:.65rem;color:var(--text);}
+.challenge-bar-wrap{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.challenge-fill{height:100%;background:linear-gradient(90deg,var(--sun),var(--mint));border-radius:2px;transition:width .4s;}
+.challenge-pts{font-family:'Bebas Neue';font-size:.72rem;color:var(--sun);margin-left:2px;}
+.survival-wave{background:rgba(255,77,109,.08);border:1.5px solid rgba(255,77,109,.25);border-radius:8px;padding:5px 9px;font-size:.67rem;color:var(--hot-pink);font-weight:700;text-align:center;}
+.mode-tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:.55rem;font-family:'Bebas Neue';letter-spacing:1px;margin-left:4px;}
+
+/* misc compat */
+.modecard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.modecard{border-radius:12px;padding:10px 6px 8px;border:2px solid var(--border);background:rgba(255,255,255,.7);cursor:pointer;transition:all .18s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;user-select:none;}
+.modecard-icon{font-size:1.8rem;}
+.modecard-name{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:1px;}
+.modecard-tag{font-size:.52rem;color:var(--muted);text-transform:uppercase;}
+.modecard:hover,.modecard.active{transform:translateY(-2px);box-shadow:0 6px 18px rgba(255,77,109,.2);}
+.modecfg-header{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;margin-bottom:2px;}
+.modecfg-icon{font-size:2rem;}
+.modecfg-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;}
+.modecfg-subtitle{font-size:.62rem;opacity:.55;letter-spacing:.5px;}
+.modecfg-header-solo{background:linear-gradient(120deg,rgba(255,0,110,.1),rgba(255,77,109,.06));border:1px solid rgba(255,0,110,.2);}
+.modecfg-header-solo .modecfg-title{color:#C9002E;}
+.modecfg-header-online{background:linear-gradient(120deg,rgba(72,202,228,.1),rgba(173,232,244,.06));border:1px solid rgba(72,202,228,.25);}
+.modecfg-header-online .modecfg-title{color:#0066CC;}
+.mode-rules-box{background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;}
+.mode-rules-title{font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:2px;color:var(--hot-pink);}
+.mode-rules-item{display:flex;gap:7px;font-size:.72rem;line-height:1.55;color:var(--text);}
+.team-btn{flex:1;padding:10px 6px;border:2px solid var(--border);border-radius:9px;background:rgba(255,255,255,.8);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:1px;cursor:pointer;transition:all .15s;}
+.team-btn.team-w.active,.team-btn.team-w:hover{border-color:#FFBE0B;background:rgba(255,190,11,.12);color:#A67B00;}
+.team-btn.team-b.active,.team-btn.team-b:hover{border-color:var(--hot-pink);background:rgba(255,0,110,.08);color:#C9002E;}
+
+/* ── RESPONSIVE TABLETTE (900px) ── */
+@media(max-width:900px){
+  :root{--cell:clamp(44px,8vw,60px);}
+  html,body{height:auto;min-height:100%;overflow-y:auto;}
+  #screen-lobby,#screen-game{overflow:visible;height:auto;flex:none;}
+  #screen-game{padding-bottom:24px;}
+  .game-root{
+    flex-direction:column;align-items:center;
+    overflow:visible;padding:6px 10px 20px;gap:10px;
+  }
+  .board-col{width:100%;align-items:center;}
+  .right-panel{
+    width:100%;max-width:100%;max-height:none;
+    flex-direction:row;flex-wrap:wrap;
+    gap:8px;overflow:visible;
+  }
+  /* Panneau tour + main : pleine largeur */
+  .right-panel .pcard:nth-child(1){flex:100%;}
+  .right-panel .pcard:nth-child(2){flex:100%;}
+  /* Captures + Journal côte à côte */
+  .right-panel .pcard{flex:1;min-width:180px;}
+  .hand-cards{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;justify-content:flex-start;}
+  .hand-cards::-webkit-scrollbar{height:3px;}
+  .hand-cards::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+  .uno-card{width:76px;height:110px;}
+  .cv{font-size:1.9rem;}
+  .pbanner{font-size:.85rem;padding:7px 12px;}
+  .mcounter{font-size:2.4rem;}
+  .piece{font-size:clamp(1.6rem,7vw,2.8rem);}
+  .coord-row{padding:0 16px;}
+  .rlbl{width:16px;}
+  .log{max-height:80px;}
+}
+
+/* ── RESPONSIVE MOBILE (600px) ── */
+@media(max-width:600px){
+  :root{--cell:clamp(36px,11.5vw,52px);}
+  h1{font-size:clamp(1.6rem,8vw,2.4rem);letter-spacing:4px;}
+  .header{padding:6px 0 2px;}
+  .subtitle{font-size:.6rem;}
+  .game-root{padding:4px 6px 16px;gap:8px;}
+  .hand-card{width:48px;height:68px;}
+  .hand-card .hcv{font-size:1rem;}
+  .hand-card .hcs{font-size:.4rem;}
+  .uno-card{width:68px;height:98px;}
+  .cv{font-size:1.7rem;}
+  .pbanner{font-size:.78rem;padding:6px 10px;gap:6px;}
+  .pname{font-size:.72rem;}
+  .mcounter{font-size:2rem;}
+  .mlabel{font-size:.6rem;}
+  .status-box{font-size:.82rem;}
+  .pcard{padding:9px 11px;gap:6px;}
+  .pcard-title{font-size:.88rem;}
+  .coord-row{padding:0 12px;}
+  .rlbl{width:12px;font-size:.45rem;}
+  .clbl{font-size:.45rem;}
+  .back-btn{font-size:.68rem;padding:4px 10px;}
+  .log{max-height:65px;font-size:.62rem;}
+  .blitz-val{font-size:.82rem;}
+}
+
+/* ── RESPONSIVE PETIT MOBILE (430px) ── */
+@media(max-width:430px){
+  :root{--cell:clamp(32px,12vw,44px);}
+  h1{font-size:1.7rem;letter-spacing:3px;}
+  .hand-card{width:42px;height:60px;}
+  .hand-card .hcv{font-size:.9rem;}
+  .uno-card{width:60px;height:88px;}
+  .cv{font-size:1.5rem;}
+  .mcounter{font-size:1.8rem;}
+  .piece{font-size:clamp(1.3rem,10vw,2rem);}
+  .lobby-card{padding:13px;}
+  .lobby-btn{font-size:.98rem;padding:12px 14px;}
+  .right-panel .pcard{min-width:140px;}
+  /* Sur très petit écran, tout en colonne */
+  .right-panel{flex-direction:column;}
+  .right-panel .pcard{flex:none;width:100%;}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>UNO CHESS</h1>
+  <p class="subtitle">Le chaos des cartes sur l'échiquier</p>
+</div>
+
+
+<!-- LOBBY -->
+<div id="screen-lobby">
+<div class="lobby-wrap">
+  <div class="lobby-tabs">
+    <button class="lobby-tab active" id="tab-play" onclick="switchLobbyTab('play')">🎮 Jouer</button>
+    <button class="lobby-tab" id="tab-options" onclick="switchLobbyTab('options')">⚙️ Options</button>
+    <button class="lobby-tab" id="tab-tuto" onclick="switchLobbyTab('tuto')">📖 Tutoriel</button>
+  </div>
+
+  <!-- PLAY TAB -->
+  <div class="lobby-tab-content active" id="ltab-play">
+
+    <div class="lobby-card" id="step1-card">
+      <div class="lobby-title">🎮 Comment veux-tu jouer ?</div>
+      <div class="ptype-grid">
+        <div class="ptype-card active" id="ptype-solo" onclick="selectPlayType('solo')">
+          <div class="ptype-icon">🤖</div>
+          <div class="ptype-name">Solo vs IA</div>
+          <div class="ptype-tag">1 joueur</div>
+        </div>
+        <div class="ptype-card" id="ptype-online" onclick="selectPlayType('online')">
+          <div class="ptype-icon">🌐</div>
+          <div class="ptype-name">En ligne</div>
+          <div class="ptype-tag">réseau P2P</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 : Solo config -->
+    <div class="lobby-card" id="step2-solo" style="display:flex;">
+      <div class="lobby-title">🤖 Solo vs IA</div>
+      <div class="team-btns">
+        <button class="team-btn team-w active" id="cfg-team-w" onclick="setCfgTeam('w')">♔ Jouer les Blancs</button>
+        <button class="team-btn team-b" id="cfg-team-b" onclick="setCfgTeam('b')">♚ Jouer les Noirs</button>
+      </div>
+      <button class="lobby-btn" onclick="launchGame()">▶ Jouer contre l'IA</button>
+      <div style="background:rgba(255,190,11,.09);border:1.5px solid rgba(255,190,11,.3);border-radius:10px;padding:10px 12px;font-size:.78rem;color:#7a5500;line-height:1.6;">
+        🤖 <b>Options IA :</b> difficulté, points de vie, cartes spéciales… tout se configure dans l'onglet <b>⚙️ Options</b>.<br>
+        📖 Nouveau ? Lis le <b>Tutoriel</b> pour comprendre les règles en 5 minutes !
+      </div>
+    </div>
+
+    <!-- STEP 2 : Online config -->
+    <div class="lobby-card" id="step2-online" style="display:none;">
+      <div class="lobby-title">🌐 Jouer en ligne</div>
+      <button class="lobby-btn" onclick="hostGame()">🏠 Créer une partie</button>
+      <div class="lobby-sep">OU</div>
+      <input class="lobby-input" id="join-id" placeholder="Code de la partie" maxlength="36">
+      <button class="lobby-btn danger" onclick="joinGame()">🔗 Rejoindre</button>
+      <div id="online-status"></div>
+      <div id="room-box" style="display:none;"></div>
+      <div class="online-info-box">
+        <div class="online-info-title">📋 Comment jouer en ligne</div>
+        <div class="online-info-item">🏠 L'hôte clique <b>Créer une partie</b>, attend que le code apparaisse, puis le partage à son adversaire.</div>
+        <div class="online-info-item">🔗 L'adversaire colle le code dans le champ et clique <b>Rejoindre</b>. La partie démarre automatiquement.</div>
+        <div class="online-info-item">🔄 Chaque joueur joue à son tour — impossible de bouger pendant le tour adverse.</div>
+        <div class="online-info-item">♚ Capturez le Roi adverse pour gagner !</div>
+      </div>
+    </div>
+
+    <!-- keep cfg-online stub for JS compat -->
+    <div id="cfg-online" style="display:none;"></div>
+    <div id="step2-modes" style="display:none;"></div>
+    <div id="step2-title" style="display:none;"></div>
+    <div id="step3-cfg"></div>
+  </div>
+
+  <!-- OPTIONS TAB -->
+  <div class="lobby-tab-content" id="ltab-options">
+    <div class="lobby-card">
+      <div class="lobby-title">⚙️ Options — Solo vs IA uniquement</div>
+      <div style="background:rgba(255,190,11,.1);border:1.5px solid rgba(255,190,11,.35);border-radius:10px;padding:10px 13px;font-size:.78rem;color:#7a5500;line-height:1.6;">
+        🤖 Ces options s'appliquent <b>uniquement au mode Solo contre l'IA</b>.<br>En ligne, les deux joueurs jouent toujours avec les règles par défaut.
+      </div>
+
+      <div class="opt-section-title">🤖 Intelligence artificielle</div>
+      <div class="opt-row">
+        <label>Difficulté IA</label>
+        <select class="opt-select" id="opt-ai-diff" style="width:auto;min-width:120px;">
+          <option value="easy">😴 Facile</option>
+          <option value="normal" selected>🧠 Normal</option>
+          <option value="hard">💀 Difficile</option>
+        </select>
+      </div>
+
+      <div class="opt-section-title">🛡️ Durabilité</div>
+      <div class="opt-grid">
+        <div class="opt-item opt-on" id="opt-hp" onclick="toggleOpt('hp')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">❤️ Points de vie</div><div class="opt-desc">Les pièces encaissent avant de mourir</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-king-shield" onclick="toggleOpt('king-shield')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">👑 Bouclier Roi</div><div class="opt-desc">Le Roi a 1 bouclier permanent</div></div>
+        </div>
+      </div>
+
+      <div class="opt-section-title">🃏 Cartes spéciales</div>
+      <div class="opt-grid">
+        <div class="opt-item opt-on" id="opt-card-shield" onclick="toggleOpt('card-shield')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">🛡️ Bouclier</div><div class="opt-desc">Protège une pièce 1 tour</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-card-swap" onclick="toggleOpt('card-swap')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">🔀 Échange</div><div class="opt-desc">Swap 2 pions de ta couleur</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-card-res" onclick="toggleOpt('card-res')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">✨ Résurrection</div><div class="opt-desc">Ramène une pièce capturée</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-card-gel" onclick="toggleOpt('card-gel')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">❄️ Gel</div><div class="opt-desc">Gèle une pièce adverse 2 tours</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-card-vol" onclick="toggleOpt('card-vol')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">🪄 Vol</div><div class="opt-desc">Joue 1 coup avec une pièce adverse</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-card-meteor" onclick="toggleOpt('card-meteor')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">☄️ Météore</div><div class="opt-desc">Détruit une colonne entière</div></div>
+        </div>
+      </div>
+
+      <div class="opt-section-title">⚡ Gameplay</div>
+      <div class="opt-grid">
+        <div class="opt-item" id="opt-blitz" onclick="toggleOpt('blitz')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">⏱️ Blitz</div><div class="opt-desc">20 secondes par tour max</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-zones" onclick="toggleOpt('zones')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">🗺️ Zones spéciales</div><div class="opt-desc">Cases boost ⚡ sur le plateau</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-regen" onclick="toggleOpt('regen')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">💚 Régénération</div><div class="opt-desc">Cases qui redonnent 1 PV</div></div>
+        </div>
+        <div class="opt-item opt-on" id="opt-promo" onclick="toggleOpt('promo')">
+          <div class="opt-checkbox"></div>
+          <div><div class="opt-label">♕ Promotion</div><div class="opt-desc">Pion en bout → Dame</div></div>
+        </div>
+      </div>
+      <div class="lobby-info" style="margin-top:2px;">Les options s'appliquent à toutes les parties solo jusqu'à modification.</div>
+    </div>
+  </div>
+
+  <!-- TUTORIEL TAB (mini résumé + bouton pour ouvrir le tutoriel complet) -->
+  <div class="lobby-tab-content" id="ltab-tuto">
+    <div class="lobby-card">
+      <div class="lobby-title">📖 Tutoriel — UNO Chess</div>
+
+      <div style="background:rgba(255,0,110,.05);border:1.5px solid rgba(255,0,110,.18);border-radius:11px;padding:13px 15px;font-size:.88rem;line-height:1.75;color:var(--text);">
+        🎯 <b>UNO Chess</b> = Échecs + UNO.<br>
+        Chaque tour, tu joues <b>une carte</b> de ta main qui te donne un <b>nombre de coups aux échecs</b> à faire.<br>
+        Le but : <b>capturer le Roi adverse !</b>
+      </div>
+
+      <button class="lobby-btn" onclick="openTuto()">🎓 Ouvrir le tutoriel complet</button>
+
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div style="font-family:'Bebas Neue';font-size:.9rem;letter-spacing:2px;color:var(--hot-pink);">⚡ En bref</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:.84rem;line-height:1.6;">
+            <span style="font-size:1.1rem;flex-shrink:0;">1️⃣</span>
+            <span>Clique une carte dans ta main → elle te donne des coups à jouer.</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:.84rem;line-height:1.6;">
+            <span style="font-size:1.1rem;flex-shrink:0;">2️⃣</span>
+            <span>Clique une de tes pièces sur l'échiquier, puis une case verte ou rouge.</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:.84rem;line-height:1.6;">
+            <span style="font-size:1.1rem;flex-shrink:0;">3️⃣</span>
+            <span>Ta carte impose une <b>couleur</b> à l'adversaire. S'il n'a pas cette couleur → il pioche et passe.</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;font-size:.84rem;line-height:1.6;">
+            <span style="font-size:1.1rem;flex-shrink:0;">🏆</span>
+            <span>Capture le <b>Roi adverse</b> pour gagner la partie !</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- TUTORIEL OVERLAY COMPLET -->
+<div class="tuto-ov" id="tuto-ov">
+  <div class="tuto-box">
+    <div class="tuto-header">
+      <span style="font-size:1.6rem;">🎓</span>
+      <div class="tuto-title">Tutoriel UNO Chess</div>
+      <button class="tuto-close" onclick="closeTuto()">✕</button>
+    </div>
+    <div class="tuto-steps" id="tuto-steps-bar"></div>
+    <div class="tuto-content" id="tuto-content"></div>
+    <div class="tuto-footer">
+      <button class="tuto-nav-btn tuto-prev" id="tuto-prev" onclick="tutoNav(-1)">← Précédent</button>
+      <span class="tuto-page-counter" id="tuto-counter">1 / 6</span>
+      <button class="tuto-nav-btn tuto-next" id="tuto-next" onclick="tutoNav(1)">Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game">
+<div class="game-root">
+  <div class="board-col">
+    <button class="back-btn" onclick="backToLobby()">← Menu</button>
+    <div class="pbanner pblack" id="banner-top">
+      <div class="pdot b"></div>
+      <span class="pname" id="bname-top">Noirs ♚</span>
+      <div class="hp-bar-wrap" id="hp-top"></div>
+      <span class="ptag" id="btag-top" style="display:none">VOTRE TOUR</span>
+      <span class="pai-tag" id="bai-top" style="display:none">IA 🤖</span>
+    </div>
+    <div class="coord-row" id="coord-top"></div>
+    <div style="display:flex;gap:2px;align-items:center;">
+      <div class="coord-col" id="coord-left"></div>
+      <div class="board" id="board"></div>
+      <div class="coord-col" id="coord-right"></div>
+    </div>
+    <div class="coord-row" id="coord-bot"></div>
+    <div class="pbanner pwhite" id="banner-bot">
+      <div class="pdot w"></div>
+      <span class="pname" id="bname-bot">Blancs ♔</span>
+      <div class="hp-bar-wrap" id="hp-bot"></div>
+      <span class="ptag" id="btag-bot" style="display:none">VOTRE TOUR</span>
+      <span class="pai-tag" id="bai-bot" style="display:none">IA 🤖</span>
+    </div>
+    <div class="legend">
+      <div class="leg-i"><span class="lpw">♙</span>Blancs</div>
+      <div class="leg-i lsep">│</div>
+      <div class="leg-i"><span class="lpb">♟</span>Noirs</div>
+      <div class="leg-i lsep">│</div>
+      <div class="leg-i"><span style="color:rgba(78,205,196,.9);font-size:.75rem;">●</span>Mvt</div>
+      <div class="leg-i"><span style="color:var(--coral);font-size:.75rem;">◉</span>Cap</div>
+      <div class="leg-i lsep" id="legend-zones" style="display:none">│</div>
+      <div class="leg-i" id="legend-zone-boost" style="display:none"><span>⚡</span>Boost</div>
+      <div class="leg-i" id="legend-zone-regen" style="display:none"><span>💚</span>Regen</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="pcard">
+      <div class="pcard-title" id="mode-badge">⚡ UNO CHESS</div>
+      <div class="turn-box tw" id="turn-box">
+        <div class="trow">
+          <div class="tdot w" id="tdot"></div>
+          <span id="ttext" style="font-size:.77rem;">Blancs ♔</span>
+        </div>
+        <div class="mcounter" id="mcounter">–</div>
+        <div class="mlabel" id="mlabel">Tirez une carte</div>
+      </div>
+      <!-- DISCARD PILE (dernière carte posée) -->
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center;padding:4px 0;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="font-size:.6rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Dernière carte</div>
+          <div id="discard-top" style="display:flex;align-items:center;justify-content:center;min-height:90px;">
+            <span style="font-size:.65rem;color:var(--muted);">Aucune carte</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="font-size:.6rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Pioche</div>
+          <div style="width:60px;height:88px;border-radius:9px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #3a3a5c;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="drawAndPass()" title="Piocher une carte">
+            <span style="font-size:1.7rem;">🃏</span>
+          </div>
+          <div class="deck-info" id="deck-info" style="font-size:.6rem;">108</div>
+        </div>
+      </div>
+      <div id="blitz-row" class="blitz-row" style="display:none">
+        <span style="font-size:.55rem;color:var(--muted);">⏱</span>
+        <div class="blitz-bar-wrap"><div class="blitz-bar" id="blitz-bar" style="width:100%"></div></div>
+        <span class="blitz-val" id="blitz-val">20</span>
+      </div>
+      <button class="draw-btn" id="draw-btn" onclick="drawCard()" style="display:none;">🃏 Tirer</button>
+      <div class="ai-thinking" id="ai-thinking">IA réfléchit<span class="ai-dot">.</span><span class="ai-dot">.</span><span class="ai-dot">.</span></div>
+      <div class="status-box" id="status">🃏 Tirez une carte !</div>
+      <div id="effect-status" style="display:none;text-align:center;margin-top:2px;"></div>
+    </div>
+
+    <div class="pcard">
+      <div class="pcard-title">🃏 Main</div>
+      <div class="hand-area">
+        <div id="color-constraint-box" style="display:none;"></div>
+        <div id="stack-badge-box" style="display:none;"></div>
+        <div id="uno-btn-box" style="display:none;"></div>
+        <div id="uno-called-box" style="display:none;"></div>
+        <div class="hand-label" id="hand-label">Votre main</div>
+        <div class="hand-cards" id="hand-cards"></div>
+        <div id="hand-actions" style="display:flex;gap:5px;width:100%;margin-top:2px;">
+          <button id="draw-pass-btn" onclick="drawAndPass()" style="display:none;flex:1;padding:9px;border:1.5px solid var(--border2);border-radius:9px;background:rgba(255,180,194,.15);color:var(--muted);font-family:'Bebas Neue';font-size:.95rem;letter-spacing:1px;cursor:pointer;" title="Piocher 1 carte du paquet">🃏 Piocher</button>
+        </div>
+        <div id="card-display" style="display:none;"></div>
+        <div class="wild-pick" id="wild-pick" style="display:none">
+          <button class="btn-w" onclick="pickTeam('w')">♔ Jouer les Blancs</button>
+          <button class="btn-b" onclick="pickTeam('b')">♚ Jouer les Noirs</button>
+        </div>
+        <div id="meteor-pick" style="display:none;width:100%">
+          <div style="font-size:.6rem;color:var(--muted);text-align:center;margin-bottom:4px;">Choisissez une colonne à détruire :</div>
+          <div style="display:flex;gap:4px;justify-content:center;">
+            <button onclick="doMeteor(0)" style="padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;font-family:'Bebas Neue';">A</button>
+            <button onclick="doMeteor(1)" style="padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;font-family:'Bebas Neue';">B</button>
+            <button onclick="doMeteor(2)" style="padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;font-family:'Bebas Neue';">C</button>
+            <button onclick="doMeteor(3)" style="padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;font-family:'Bebas Neue';">D</button>
+            <button onclick="doMeteor(4)" style="padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;font-family:'Bebas Neue';">E</button>
+            <button onclick="doMeteor(5)" style="padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;font-family:'Bebas Neue';">F</button>
+            <button onclick="doMeteor(6)" style="padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;font-family:'Bebas Neue';">G</button>
+            <button onclick="doMeteor(7)" style="padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;font-family:'Bebas Neue';">H</button>
+          </div>
+        </div>
+        <div class="deck-info" id="deck-info-hand" style="display:none;"></div>
+      </div>
+      <div id="spawn-indicator" style="display:none;"></div>
+    </div>
+
+    <div class="pcard">
+      <div class="pcard-title">⚔️ Captures</div>
+      <div class="captured-box">
+        <div class="cap-row">
+          <span class="cap-label" style="color:#D44060;">Noirs ♟</span>
+          <div class="cap-pieces" id="cap-by-white"></div>
+          <span class="cap-score" id="score-w">0</span>
+        </div>
+        <div class="cap-row">
+          <span class="cap-label">Blancs ♙</span>
+          <div class="cap-pieces" id="cap-by-black"></div>
+          <span class="cap-score" id="score-b">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pcard" id="challenge-panel" style="display:none;">
+      <div class="pcard-title">🎯 Défis</div>
+      <div class="challenge-box" id="challenge-list"></div>
+      <div style="font-size:.58rem;color:var(--muted);text-align:center;">Points défi : <b id="challenge-score-val" style="color:var(--sun);">0</b></div>
+    </div>
+    <div class="pcard" id="survival-panel" style="display:none;">
+      <div class="pcard-title">⏱️ Survie</div>
+      <div class="survival-wave" id="survival-wave-label">Vague 1</div>
+      <div style="font-size:.6rem;color:var(--muted);text-align:center;margin-top:3px;">Tours survivus : <b id="survival-turns" style="color:var(--hot-pink);">0</b></div>
+    </div>
+
+    <div class="pcard">
+      <div class="pcard-title" style="font-size:.75rem;">📋 Journal</div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <h2 id="m-title">Victoire !</h2>
+    <p id="m-body"></p>
+    <button onclick="resetGame()">🔄 Rejouer</button>
+    <button class="btn-back2" onclick="backToLobby()">← Menu</button>
+  </div>
+</div>
+
+<!-- PASS SCREEN -->
+<div class="pass-ov" id="pass-ov">
+  <div class="pass-piece" id="pass-piece">♔</div>
+  <div class="pass-title" id="pass-title">À toi !</div>
+  <div class="pass-sub" id="pass-sub">Passe l'appareil, puis appuie pour commencer.</div>
+  <button class="pass-btn" onclick="resumeAfterPass()">▶ Je suis prêt !</button>
+</div>
+
+<!-- WAIT -->
+<div class="wait-ov" id="wait-ov">
+  <div class="wait-spin"></div>
+  <div class="wait-msg" id="wait-msg">Connexion...</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ══════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════
+const GLYPH={wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'};
+const COL_LETTERS='ABCDEFGH';
+const COLOR_ICON={red:'🔴',blue:'🔵',green:'🟢',yellow:'🟡',wild:'🌈',shield:'🛡️',swap:'🔀',res:'✨',gel:'❄️',vol:'🪄',meteor:'☄️'};
+const PIECE_NAME={K:'Roi',Q:'Dame',R:'Tour',B:'Fou',N:'Cavalier',P:'Pion'};
+const PIECE_VALUE={K:0,Q:9,R:5,B:3,N:3,P:1};
+const MAX_HP={K:3,Q:3,R:2,B:2,N:2,P:1};
+
+// ══════════════════════════════════════
+// OPTIONS STATE
+// ══════════════════════════════════════
+const opts={
+  hp:true,'king-shield':true,
+  'card-shield':true,'card-swap':true,'card-res':true,'card-gel':true,'card-vol':true,'card-meteor':true,
+  blitz:false,zones:true,combo:true,promo:true,regen:true
+};
+function toggleOpt(k){
+  opts[k]=!opts[k];
+  const el=document.getElementById('opt-'+k);
+  el.classList.toggle('opt-on',opts[k]);
+}
+
+// ══════════════════════════════════════
+// LOBBY NAVIGATION — 2 étapes
+// ══════════════════════════════════════
+function switchLobbyTab(tab){
+  ['play','options','tuto'].forEach(t=>{
+    const btn=document.getElementById('tab-'+t);
+    const cnt=document.getElementById('ltab-'+t);
+    if(btn)btn.classList.toggle('active',t===tab);
+    if(cnt)cnt.classList.toggle('active',t===tab);
+  });
+}
+
+let currentPlayType='solo';
+let currentGameMode='standard';
+
+function selectPlayType(type){
+  currentPlayType=type;
+  // Update ptype cards
+  ['solo','online'].forEach(t=>{
+    const el=document.getElementById('ptype-'+t);
+    if(el){el.classList.remove('active','active-online');if(t===type)el.classList.add(type==='online'?'active-online':'active');}
+  });
+  // Show/hide step2 panels
+  document.getElementById('step2-solo').style.display=type==='solo'?'flex':'none';
+  document.getElementById('step2-online').style.display=type==='online'?'flex':'none';
+}
+
+function selectGameMode(mode){currentGameMode=mode;}
+function renderCfgCard(){}
+
+// Rend la carte de config (étape 3) selon type + mode
+function renderCfgCard(){
+  const type=currentPlayType;
+  const mode=currentGameMode;
+  const el=document.getElementById('step3-cfg');
+
+  // Données par mode
+  const modeInfo={
+    standard:{icon:'♟️',title:'Standard',subtitle:'Les règles UNO Chess classiques',color:'var(--hot-pink)',headerClass:'modecfg-header-solo'},
+    ko:{icon:'🎲',title:'Mode KO',subtitle:'Plateau aléatoire style Chess960',color:'#C9002E',headerClass:'modecfg-header-ko'},
+    defi:{icon:'🎯',title:'Mode Défi',subtitle:'Accomplis des objectifs pour des points bonus',color:'#A67B00',headerClass:'modecfg-header-defi'},
+    chaos:{icon:'🌀',title:'Mode Chaos',subtitle:'Toutes les pièces placées aléatoirement',color:'#7B3FA0',headerClass:'modecfg-header-chaos'},
+    survie:{icon:'⏱️',title:'Mode Survie',subtitle:'Résistez aux vagues de pions ennemis',color:'#048A68',headerClass:'modecfg-header-survie'},
+    fantome:{icon:'👻',title:'Mode Fantôme',subtitle:'Les pièces adverses sont invisibles',color:'#0066CC',headerClass:'modecfg-header-fantome'},
+  };
+  const m=modeInfo[mode];
+
+  let teamBtns='';
+  const teamId='cfg-team';
+  if(mode!=='survie'){
+    teamBtns=`<div style="display:flex;gap:8px;">
+      <button class="team-btn team-w active" id="${teamId}-w" onclick="setCfgTeam('w')">♔ Blancs</button>
+      <button class="team-btn team-b" id="${teamId}-b" onclick="setCfgTeam('b')">♚ Noirs</button>
+    </div>`;
+  }
+
+  // Bouton de lancement
+  let btnStyle='background:linear-gradient(135deg,var(--hot-pink),var(--coral));';
+  if(mode==='ko')btnStyle='background:linear-gradient(135deg,var(--hot-pink),#900030);';
+  else if(mode==='defi')btnStyle='background:linear-gradient(135deg,#C87B00,#FFBE0B);color:#2D0A14;';
+  else if(mode==='chaos')btnStyle='background:linear-gradient(135deg,#C77DFF,#7B3FA0);';
+  else if(mode==='survie')btnStyle='background:linear-gradient(135deg,#06D6A0,#048A68);';
+  else if(mode==='fantome')btnStyle='background:linear-gradient(135deg,#48CAE4,#0066CC);';
+
+  const isLocal=false; // local mode removed
+  const isOnline=type==='online';
+  let btnLabel='';
+  if(isOnline){
+    btnLabel=''; // online has its own host/join buttons
+  } else {
+    btnLabel={standard:'▶ Jouer contre l\'IA',ko:'▶ Lancer le Mode KO',chaos:'▶ Lancer le Chaos'}[mode]||'▶ Jouer';
+  }
+
+  // Champs noms supprimés (local mode retiré)
+  let nameFields='';
+  if(isOnline) teamBtns='';
+
+  // Règles selon mode
+  const rules={
+    standard:[
+      '🃏 Tirez une carte UNO à chaque tour pour obtenir vos coups.',
+      '♚ Capturez le Roi adverse pour gagner — pas d\'échec et mat !',
+      isLocal?'🔄 Écran de passage entre chaque tour pour cacher le jeu.':'🤖 L\'IA joue l\'autre camp selon la difficulté choisie dans Options.',
+      '⚙️ Personnalisez les règles dans l\'onglet Options avant de jouer.',
+    ],
+    ko:[
+      '🎲 Les pièces de la rangée arrière sont placées dans un ordre aléatoire au départ.',
+      '♜ Le roi est toujours entre ses deux tours — les fous sur des couleurs opposées.',
+      '🃏 Toutes les règles UNO Chess habituelles s\'appliquent.',
+      isLocal?'🔄 Écran de passage entre chaque tour.':'🤖 Adaptez votre stratégie à la disposition surprise !',
+    ],
+    defi:[
+      '🎯 3 défis aléatoires sont générés : capturer des pièces, promouvoir un pion, faire des combos…',
+      '⭐ Chaque défi accompli rapporte des points bonus affichés dans le panneau latéral.',
+      '✅ Les barres de progression montrent votre avancement en temps réel.',
+      '🏆 Capturez le Roi pour finir — votre score de défi s\'affiche à la victoire !',
+    ],
+    chaos:[
+      '🌀 Les 32 pièces des deux camps sont dispersées aléatoirement sur tout le plateau.',
+      '⚠️ Les rois peuvent se retrouver n\'importe où — même en danger immédiat dès le départ !',
+      '🃏 Toutes les règles UNO Chess s\'appliquent (cartes, HP, zones…).',
+      isLocal?'🔄 Écran de passage entre chaque tour.':isOnline?'🔄 Chaque joueur joue à son tour via P2P.':'🤖 Évaluez vite la situation et adaptez-vous au chaos !',
+    ],
+    survie:[
+      '⏱️ Vous jouez toujours les Blancs. À chaque tour adverse, une vague de pions noirs envahit le plateau.',
+      '📈 La taille des vagues augmente : vague 1 → 4 pions, vague 2 → 5 pions, etc.',
+      '♟ Les pions apparaissent sur des cases vides aléatoires.',
+      '🏆 Votre score final affiche le nombre de tours survivus et la vague atteinte.',
+    ],
+    fantome:[
+      '👻 Les pièces adverses sont invisibles — vous ne voyez que les vôtres au départ.',
+      '👁️ Une pièce ennemie se révèle temporairement quand elle bouge ou vous attaque.',
+      '🧠 Mémorisez les positions révélées et anticipez les mouvements ennemis.',
+      isLocal?'🔄 Écran de passage entre chaque tour.':isOnline?'🔄 Les pièces cachées s\'appliquent aux deux joueurs !':'🃏 Toutes les règles UNO Chess s\'appliquent !',
+    ],
+  };
+  const ruleItems=(rules[mode]||[]).map(r=>`<div class="mode-rules-item">${r}</div>`).join('');
+
+  // Boutons P2P pour l'online
+  const onlineFields=isOnline?`
+    <button class="lobby-btn" onclick="hostGame()">🏠 Créer une partie</button>
+    <div class="lobby-sep">OU</div>
+    <input class="lobby-input" id="join-id" placeholder="Code de la partie" maxlength="36">
+    <button class="lobby-btn danger" onclick="joinGame()">🔗 Rejoindre</button>
+    <div id="online-status"></div>
+    <div id="room-box" style="display:none;"></div>`:'';
+
+  const launchBtn=isOnline?'':`<button class="lobby-btn" style="${btnStyle}" onclick="launchGame()">${btnLabel}</button>`;
+  const typeLabel=isOnline?'🌐 En ligne':'🤖 vs IA';
+
+  el.innerHTML=`<div class="lobby-card modecfg" style="display:flex;flex-direction:column;gap:10px;">
+    <div class="modecfg-header ${m.headerClass}">
+      <span class="modecfg-icon">${m.icon}</span>
+      <div>
+        <div class="modecfg-title">${m.title} — ${typeLabel}</div>
+        <div class="modecfg-subtitle">${m.subtitle}</div>
+      </div>
+    </div>
+    ${nameFields}
+    ${teamBtns}
+    ${onlineFields}
+    ${launchBtn}
+    <div class="mode-rules-box mode-rules-${mode}">
+      <div class="mode-rules-title">📋 Règles</div>
+      ${ruleItems}
+    </div>
+  </div>`;
+
+  cfgTeam='w';
+}
+
+let cfgTeam='w';
+function setCfgTeam(t){
+  cfgTeam=t;
+  const tw=document.getElementById('cfg-team-w');
+  const tb=document.getElementById('cfg-team-b');
+  if(tw)tw.classList.toggle('active',t==='w');
+  if(tb)tb.classList.toggle('active',t==='b');
+}
+
+function launchGame(){
+  const type=currentPlayType;
+  const mode=currentGameMode;
+  // Solo vs IA
+  soloTeam=cfgTeam||'w';
+  playerNames=soloTeam==='w'?{w:'Vous ♔',b:'IA ♚'}:{w:'IA ♔',b:'Vous ♚'};
+  gameMode=mode==='standard'?'solo':mode;
+  showGame();resetGame();
+}
+
+// Compat stubs (gardés pour l'online qui appelle hostGame/joinGame directement)
+function selectMode(m){}
+function setSoloTeam(t){soloTeam=t;}
+function setKOTeam(t){cfgTeam=t;}
+function setDefiTeam(t){cfgTeam=t;}
+function setChaosTeam(t){cfgTeam=t;}
+function setFantomeTeam(t){cfgTeam=t;}
+function startSolo(){gameMode='solo';playerNames=soloTeam==='w'?{w:'Vous ♔',b:'IA ♚'}:{w:'IA ♔',b:'Vous ♚'};showGame();resetGame();}
+function startLocal(){launchGame();}
+function startKO(){soloTeam=cfgTeam;playerNames=soloTeam==='w'?{w:'Vous ♔',b:'IA ♚'}:{w:'IA ♔',b:'Vous ♚'};showGame();resetGame();}
+function startDefi(){soloTeam=cfgTeam;playerNames=soloTeam==='w'?{w:'Vous ♔',b:'IA ♚'}:{w:'IA ♔',b:'Vous ♚'};showGame();resetGame();}
+function startChaos(){soloTeam=cfgTeam;playerNames=soloTeam==='w'?{w:'Vous ♔',b:'IA ♚'}:{w:'IA ♔',b:'Vous ♚'};showGame();resetGame();}
+function startSurvie(){soloTeam='w';playerNames={w:'Vous ♔',b:'Vagues ♚'};showGame();resetGame();}
+function startFantome(){soloTeam=cfgTeam;playerNames=soloTeam==='w'?{w:'Vous ♔',b:'Fantômes ♚'}:{w:'Fantômes ♔',b:'Vous ♚'};showGame();resetGame();}
+
+
+function showGame(){
+  document.getElementById('screen-lobby').style.display='none';
+  document.getElementById('screen-game').style.display='flex';
+  buildCoords();
+}
+function backToLobby(){
+  stopBlitz();
+  document.getElementById('screen-lobby').style.display='flex';
+  document.getElementById('screen-game').style.display='none';
+  document.getElementById('modal').classList.remove('on');
+  document.getElementById('pass-ov').classList.remove('on');
+  leaveChannel();
+  aiPaused=true;
+}
+
+// ══════════════════════════════════════
+// ONLINE — Supabase Realtime
+// ══════════════════════════════════════
+const SUPA_URL='https://qxrvzcfxgondsewpwpiq.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4cnZ6Y2Z4Z29uZHNld3B3cGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MjMwMzAsImV4cCI6MjA5Mzk5OTAzMH0.eUcR3g987dfVYcJluGnnaaI6hn4Nz_Q8hXfualxbpo8';
+
+let sbClient=null,sbChannel=null;
+let myRole=null,onlineConnected=false,myId=null;
+
+function getSB(){
+  if(!sbClient)sbClient=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+  return sbClient;
+}
+
+function genCode(){return Math.random().toString(36).substr(2,6).toUpperCase();}
+
+function leaveChannel(){
+  if(sbChannel){sbChannel.unsubscribe();sbChannel=null;}
+  onlineConnected=false;
+}
+
+function hostGame(){
+  leaveChannel();
+  const code=genCode();
+  myRole='host';
+  myId='host_'+Date.now();
+  gameMode=currentGameMode==='standard'?'online':currentGameMode;
+  setOStat('wait','⏳ Création de la partie...');
+
+  const roomHtml=`<div class="room-id-box">Code : <b>${code}</b> <button class="copy-btn" onclick="navigator.clipboard.writeText('${code}').then(()=>{this.textContent='✅ Copié!';setTimeout(()=>this.textContent='📋 Copier',2000)})">📋 Copier</button></div>`;
+  updateRoomBox(roomHtml);
+
+  sbChannel=getSB().channel('unochess_'+code,{config:{broadcast:{self:false}}});
+
+  sbChannel
+    .on('broadcast',{event:'msg'},({payload})=>onOnlineData(payload))
+    .subscribe(status=>{
+      if(status==='SUBSCRIBED'){
+        setOStat('wait','⏳ En attente d\'un adversaire... (code : '+code+')');
+      } else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
+        setOStat('err','❌ Erreur de connexion Supabase — réessaie');
+      }
+    });
+}
+
+function joinGame(){
+  const codeEl=document.querySelector('#join-id');
+  const code=codeEl?codeEl.value.trim().toUpperCase():'';
+  if(!code){setOStat('err','⚠️ Entrez un code de partie');return;}
+  leaveChannel();
+  myRole='guest';
+  myId='guest_'+Date.now();
+  setOStat('wait','⏳ Connexion à la partie '+code+'...');
+
+  sbChannel=getSB().channel('unochess_'+code,{config:{broadcast:{self:false}}});
+
+  sbChannel
+    .on('broadcast',{event:'msg'},({payload})=>onOnlineData(payload))
+    .subscribe(status=>{
+      if(status==='SUBSCRIBED'){
+        // Signal host that guest is ready
+        setOStat('wait','⏳ En attente de l\'hôte...');
+        setTimeout(()=>sendOnline({type:'guest_ready'}),400);
+      } else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
+        setOStat('err','❌ Code introuvable ou erreur réseau');
+      }
+    });
+}
+
+function setOStat(cls,msg){
+  document.querySelectorAll('#online-status').forEach(el=>{
+    el.className='conn-status '+cls;el.textContent=msg;
+  });
+}
+
+function updateRoomBox(html){
+  document.querySelectorAll('#room-box').forEach(el=>{
+    el.style.display='block';el.innerHTML=html;
+  });
+}
+
+function isMyTurn(){
+  if(soloTeam==='local1v1')return true;
+  if(onlineConnected)return(myRole==='host'&&controlling==='w')||(myRole==='guest'&&controlling==='b');
+  if(gameMode==='solo')return controlling===soloTeam;
+  if(gameMode==='local')return true;
+  return true;
+}
+function isAITurn(){
+  if(soloTeam==='local1v1')return false;
+  if(onlineConnected)return false;
+  const aiModes=['solo','ko','defi','chaos','survie','fantome'];
+  return aiModes.includes(gameMode)&&controlling!==soloTeam;
+}
+
+function sendOnline(data){
+  if(!sbChannel)return;
+  sbChannel.send({type:'broadcast',event:'msg',payload:data});
+}
+
+function getFullState(){
+  return {
+    board:board.map(r=>[...r]),
+    controlling,movesLeft,waitingDraw,
+    awaitingWild,awaitingGel,awaitingVol,awaitingMeteor,
+    pieceHP:{...pieceHP},kingShielded:{...kingShielded},
+    shieldedCell:shieldedCell?{...shieldedCell}:null,
+    frozenCells:[...frozenCells],frozenTurns:{...frozenTurns},
+    newPawnCells:[...newPawnCells],
+    spawnAnimCells:[...spawnAnimCells.entries()],
+    capturedByWhite:[...capturedByWhite],
+    capturedByBlack:[...capturedByBlack],
+    deck:[...deck],lastCardColor,currentCard:currentCard?{...currentCard}:null,
+    challenges:JSON.parse(JSON.stringify(challenges)),
+    challengeScore,survivalTurns,survivalWave,
+    specialZones:{traps:[...specialZones.traps],boosts:[...specialZones.boosts],regens:[...(specialZones.regens||[])]},
+    handW:[...handW],handB:[...handB],stackTotal,requiredColor,pendingWildColor:window._pendingWildColor||null,pendingRequiredColor:window._pendingRequiredColor||null,drawnThisTurn
+  };
+}
+
+function applyFullState(s){
+  board=s.board;controlling=s.controlling;movesLeft=s.movesLeft;waitingDraw=s.waitingDraw;
+  awaitingWild=s.awaitingWild||false;awaitingGel=s.awaitingGel||false;awaitingVol=s.awaitingVol||false;awaitingMeteor=s.awaitingMeteor||false;
+  pieceHP=s.pieceHP||{};kingShielded=s.kingShielded||{};shieldedCell=s.shieldedCell||null;
+  frozenCells=new Set(s.frozenCells||[]);frozenTurns=s.frozenTurns||{};newPawnCells=new Set(s.newPawnCells||[]);spawnAnimCells=new Map(s.spawnAnimCells||[]);
+  capturedByWhite=s.capturedByWhite||[];capturedByBlack=s.capturedByBlack||[];
+  deck=s.deck||[];lastCardColor=s.lastCardColor||null;currentCard=s.currentCard||null;
+  if(currentCard)displayCard(currentCard);else document.getElementById('card-display').innerHTML='';
+  challenges=s.challenges||[];challengeScore=s.challengeScore||0;
+  survivalTurns=s.survivalTurns||0;survivalWave=s.survivalWave||1;
+  if(s.specialZones)specialZones={traps:new Set(s.specialZones.traps||[]),boosts:new Set(s.specialZones.boosts||[]),regens:new Set(s.specialZones.regens||[])};
+  handW=s.handW||[];handB=s.handB||[];stackTotal=s.stackTotal||0;requiredColor=s.requiredColor||null;window._pendingWildColor=s.pendingWildColor||null;window._pendingRequiredColor=s.pendingRequiredColor||null;drawnThisTurn=s.drawnThisTurn||false;
+  renderBoard();updateTurnUI();setCounter(movesLeft);updateBanners();
+  updateHPDisplay();updateCaptureDisplay();updateEffectStatus();updateDeckInfo();renderHand();
+  // Wild picker: show if it's our turn and we need to pick
+  const wildPick=document.getElementById('wild-pick');
+  if(awaitingWild&&isMyTurn()){
+    showWildColorPicker(); // rebuild the picker UI
+    wildPick.style.display='flex';
+  } else {
+    wildPick.style.display='none';
+  }
+  const mine=isMyTurn();
+  const drawBtn=document.getElementById('draw-pass-btn');
+  console.log('[SYNC] applyFullState: controlling='+controlling+' myRole='+myRole+' isMyTurn='+mine+' waitingDraw='+waitingDraw+' movesLeft='+movesLeft+' drawnThisTurn='+drawnThisTurn);
+  if(mine&&waitingDraw&&awaitingWild){
+    setStatus('🌈 Choisissez votre équipe et une couleur !');btnEnabled(false);
+    if(drawBtn)drawBtn.style.display='none';
+  } else if(mine&&waitingDraw&&awaitingGel){
+    setStatus('❄️ Cliquez une pièce adverse à geler !');btnEnabled(false);
+    if(drawBtn)drawBtn.style.display='none';
+  } else if(mine&&waitingDraw&&awaitingVol){
+    setStatus('🪄 Cliquez une pièce adverse à contrôler !');btnEnabled(false);
+    if(drawBtn)drawBtn.style.display='none';
+  } else if(mine&&waitingDraw){
+    if(drawnThisTurn){
+      // Already drew, waiting to play or pass
+      setStatus('🃏 Carte piochée — jouez-la ou passez !');btnEnabled(true);
+      if(drawBtn){drawBtn.style.display='flex';drawBtn.textContent='⏭ Passer';drawBtn.style.background='rgba(255,77,109,.12)';drawBtn.style.color='var(--hot-pink)';}
+    } else {
+      setStatus('🃏 Choisissez une carte !');btnEnabled(true);startBlitz();
+      if(drawBtn){drawBtn.style.display='flex';drawBtn.textContent='🃏 Piocher';drawBtn.style.background='rgba(255,180,194,.15)';drawBtn.style.color='var(--muted)';}
+    }
+    console.log('[SYNC] Draw button ENABLED for guest');
+  } else if(mine&&!waitingDraw&&movesLeft>0){
+    setStatus(`🎯 ${movesLeft} coup(s) à jouer !`);btnEnabled(false);
+    if(drawBtn)drawBtn.style.display='none';
+    console.log('[SYNC] Guest can move, '+movesLeft+' moves left');
+  } else {
+    setStatus('⏳ Tour adversaire...');btnEnabled(false);stopBlitz();
+    if(drawBtn)drawBtn.style.display='none';
+    console.log('[SYNC] Guest waiting for opponent');
+  }
+}
+
+function syncState(){
+  if(!onlineConnected||myRole!=='host')return;
+  console.log('[SYNC] Host syncing state to guest. controlling='+controlling+' waitingDraw='+waitingDraw+' movesLeft='+movesLeft);
+  sendOnline({type:'fullstate',state:getFullState()});
+}
+
+function guestAction(action){
+  if(!onlineConnected||myRole!=='guest')return;
+  console.log('[GUEST] Sending action to host:', action.type);
+  sendOnline({type:'action',action});
+}
+
+function onOnlineData(data){
+  if(data.type==='guest_ready'&&myRole==='host'){
+    playerNames={w:'Vous \u2654',b:'Adversaire \u265a'};
+    onlineConnected=true;
+    setOStat('ok','\u2705 Adversaire connect\u00e9 !');
+    setTimeout(()=>{
+      sendOnline({type:'opts',opts:JSON.parse(JSON.stringify(opts)),gameMode});
+      showGame();resetGame();
+      // Send initial full state after everything is set up
+      setTimeout(()=>syncState(),500);
+    },300);
+    return;
+  }
+  if(data.type==='opts'){
+    Object.assign(opts,data.opts);
+    if(data.gameMode)gameMode=data.gameMode;
+    Object.keys(opts).forEach(k=>{
+      const el=document.getElementById('opt-'+k);
+      if(el)el.classList.toggle('opt-on',opts[k]);
+    });
+    playerNames={w:'Adversaire \u2654',b:'Vous \u265a'};
+    onlineConnected=true;
+    setOStat('ok','\u2705 Connect\u00e9 ! La partie commence...');
+    showGame();resetGame();
+    return;
+  }
+  if(data.type==='fullstate'&&myRole==='guest'){
+    applyFullState(data.state);
+    return;
+  }
+  if(data.type==='showcardDrawn'){
+    // Show opponent's played card on our side (we didn't execute it locally)
+    currentCard=data.card;displayCard(data.card);
+    console.log('[CARD] Opponent played: '+data.card.color+' '+data.card.value);
+    return;
+  }
+  if(data.type==='action'&&myRole==='host'){
+    const a=data.action;
+    console.log('[ONLINE] Host received guest action: '+a.type+' controlling='+controlling);
+    if(a.type==='draw'){drawCard(true);}
+    else if(a.type==='move'){doMove(a.fr,a.fc,a.tr,a.tc);}
+    else if(a.type==='playcard'){
+      // Guest played a card from their hand — execute on host
+      const gHand=controlling==='w'?handW:handB;
+      if(a.idx>=0&&a.idx<gHand.length)playHandCard(a.idx);
+    }
+    else if(a.type==='drawpass'){
+      if(a.step==='draw'){
+        const hand=currentHand();
+        drawFromDeck(hand,1);
+        drawnThisTurn=true;
+        const drew=hand[hand.length-1];
+        addLog(`🃏 Adversaire pioche : ${drew.color} ${drew.value}`,'sp');
+        renderHand();syncState();
+      } else if(a.step==='pass'){
+        drawnThisTurn=false;requiredColor=null;window._pendingWildColor=null;
+        addLog('⏭ Adversaire passe.','sp');
+        renderHand();syncState();endTurn();
+      }
+    }
+    else if(a.type==='forcedrawn'){
+      // Guest tried to play wrong color — draw 1 and pass
+      const hand=currentHand();
+      requiredColor=null;
+      drawFromDeck(hand,1);
+      addLog('🌈 Adversaire pioche (couleur imposée).','sp');
+      renderHand();syncState();
+      setTimeout(()=>endTurn(),1200);
+    }
+    else if(a.type==='wild'||a.type==='pickwild'){
+      // Support both old and new pickwild format — with optional color
+      pickTeam(a.team,true,a.color||null);
+    }
+    else if(a.type==='gel'){
+      if(board[a.r]&&board[a.r][a.c]){
+        frozenCells.add(a.r+','+a.c);frozenTurns[a.r+','+a.c]=2;awaitingGel=false;
+        addLog('❄️ '+PIECE_NAME[board[a.r][a.c][1]]+' gelé 2 tours !','gel');
+        renderBoard();updateEffectStatus();syncState();
+        if(movesLeft<=0)endTurn();
+      }
+    }
+    else if(a.type==='meteor'){doMeteor(a.col,true);}
+    return;
+  }
+  if(data.type==='gameover'){
+    if(data.reason==='hand')showEndGameCards(data.winner);
+    else showEndGame(data.winner);
+  }
+}
+
+// ══════════════════════════════════════
+// LOCAL PASS
+// ══════════════════════════════════════
+function showPassScreen(){
+  if(gameMode!=='local'&&soloTeam!=='local1v1')return;
+  const name=(controlling==='w'?playerNames.w:playerNames.b).replace(/[♔♚]/g,'').trim();
+  document.getElementById('pass-piece').textContent=controlling==='w'?'♔':'♚';
+  document.getElementById('pass-title').textContent='À toi, '+name+' !';
+  document.getElementById('pass-sub').textContent='Passe l\'appareil à '+name+', puis appuie sur le bouton.';
+  // Show opponent's hand face-down while screen is being passed
+  renderOpponentHand();
+  document.getElementById('pass-ov').classList.add('on');
+}
+function resumeAfterPass(){
+  document.getElementById('pass-ov').classList.remove('on');
+  btnEnabled(true);
+  setStatus('🃏 Choisissez une carte à jouer !');
+  renderHand(); // Now shows the actual current player's hand
+  startBlitz();
+}
+
+// ══════════════════════════════════════
+// BLITZ TIMER
+// ══════════════════════════════════════
+let blitzTimer=null,blitzSeconds=0;
+function startBlitz(){
+  if(!opts.blitz||isAITurn())return;
+  stopBlitz();
+  blitzSeconds=20;
+  document.getElementById('blitz-row').style.display='flex';
+  updateBlitzUI();
+  blitzTimer=setInterval(()=>{
+    blitzSeconds--;
+    updateBlitzUI();
+    if(blitzSeconds<=0){stopBlitz();addLog('⏱️ Temps écoulé !','sp');endTurn();}
+  },1000);
+}
+function stopBlitz(){
+  if(blitzTimer){clearInterval(blitzTimer);blitzTimer=null;}
+  document.getElementById('blitz-row').style.display='none';
+}
+function updateBlitzUI(){
+  const pct=(blitzSeconds/20)*100;
+  const bar=document.getElementById('blitz-bar');
+  bar.style.width=pct+'%';
+  bar.className='blitz-bar'+(blitzSeconds<=6?' urgent':'');
+  document.getElementById('blitz-val').textContent=blitzSeconds;
+}
+
+// ══════════════════════════════════════
+// DECK
+// ══════════════════════════════════════
+let lastCardColor=null;
+let currentCard=null;
+function buildDeck(){
+  const colors=['red','blue','green','yellow'],d=[];
+  for(const c of colors){
+    d.push({color:c,value:'0',type:'number'});
+    for(let v=1;v<=9;v++){d.push({color:c,value:''+v,type:'number'});d.push({color:c,value:''+v,type:'number'});}
+    for(let i=0;i<2;i++){d.push({color:c,value:'Skip',type:'skip'});d.push({color:c,value:'⇄',type:'reverse'});d.push({color:c,value:'+2',type:'draw2'});}
+  }
+  for(let i=0;i<4;i++){d.push({color:'wild',value:'Wild',type:'wild'});d.push({color:'wild',value:'+4',type:'wild4'});}
+  if(opts['card-shield'])for(let i=0;i<3;i++)d.push({color:'shield',value:'🛡️',type:'shield'});
+  if(opts['card-swap'])for(let i=0;i<3;i++)d.push({color:'swap',value:'🔀',type:'swap'});
+  if(opts['card-res'])for(let i=0;i<3;i++)d.push({color:'res',value:'✨',type:'res'});
+  if(opts['card-gel'])for(let i=0;i<3;i++)d.push({color:'gel',value:'❄️',type:'gel'});
+  if(opts['card-vol'])for(let i=0;i<3;i++)d.push({color:'vol',value:'🪄',type:'vol'});
+  if(opts['card-meteor'])for(let i=0;i<2;i++)d.push({color:'meteor',value:'☄️',type:'meteor'});
+  return shuffle([...d]);
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ══════════════════════════════════════
+// GAME STATE
+// ══════════════════════════════════════
+let gameMode='solo',soloTeam='w',playerNames={w:'Blancs ♔',b:'Noirs ♚'};
+let board,deck,controlling,movesLeft,selectedCell,validMoves,waitingDraw,awaitingWild;
+let newPawnCells=new Set(),spawnAnimCells=new Map(),aiPaused=false;
+let shieldedCell=null,awaitingSwap=false,swapFirst=null;
+let capturedByWhite=[],capturedByBlack=[];
+let pieceHP={};         // key="r,c" → hp remaining
+let kingShielded={};    // {w:bool, b:bool}
+let frozenCells=new Set(); // keys of frozen pieces
+let frozenTurns={}; // key → nb tours restants de gel (2 tours par défaut)
+let awaitingGel=false,awaitingVol=false,awaitingMeteor=false;
+let specialZones={traps:new Set(),boosts:new Set()};
+// New mode state
+let koTeam='w',defiTeam='w',chaosTeam='w',fantomeTeam='w';
+let challenges=[],challengeScore=0;
+let survivalTurns=0,survivalWave=1;
+let ghostMode=false;
+
+// ── NEW: HAND SYSTEM ──
+let handW=[]; // player white's hand (7 cards)
+let handB=[]; // player black's hand (7 cards)
+let selectedHandIdx=-1; // index of card chosen from hand
+// ── DISCARD PILE ──
+let discardPile=[]; // cards played, top = last played
+// ── NEW: STACKING ──
+let stackTotal=0; // kept for compatibility
+// ── NEW: UNO CALL ──
+let unoCalled=false;
+// ── NEW: WILD COLOR CONSTRAINT ──
+let requiredColor=null;
+
+// ── RÈGLE DE JOUABILITÉ CENTRALISÉE ──
+// Une carte est jouable si :
+//  1. Pas de contrainte de couleur → toujours jouable
+//  2. La carte EST de la bonne couleur
+//  3. La carte est wild (joker)
+//  4. La carte est spéciale (shield/swap/res/gel/vol/meteor) → toujours jouable
+//  5. La carte a la MÊME VALEUR que la dernière carte jouée (même chiffre, skip, +2, reverse)
+const SPECIAL_COLORS=['shield','swap','res','gel','vol','meteor'];
+function isPlayable(card){
+  if(!requiredColor)return true;
+  if(card.color===requiredColor)return true;
+  if(card.color==='wild')return true;
+  if(SPECIAL_COLORS.includes(card.color))return true;
+  // Même valeur/type que la contrainte actuelle → jouable (règle UNO : même numéro/symbole)
+  if(currentCard&&card.value===currentCard.value)return true;
+  return false;
+}
+
+function initBoard(){return[['bR','bN','bB','bQ','bK','bB','bN','bR'],['bP','bP','bP','bP','bP','bP','bP','bP'],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null],['wP','wP','wP','wP','wP','wP','wP','wP'],['wR','wN','wB','wQ','wK','wB','wN','wR']];}
+
+// KO: Chess960-style random back rank
+function initBoardKO(){
+  const b=initBoard();
+  function randomBackRank(){
+    const pieces=['R','N','B','Q','K','B','N','R'];
+    let rank;
+    do{rank=[...pieces];shuffle(rank);
+      const ki=rank.indexOf('K');
+      const rs=rank.reduce((a,p,i)=>p==='R'?[...a,i]:a,[]);
+      const bs=rank.reduce((a,p,i)=>p==='B'?[...a,i]:a,[]);
+      if(rs[0]<ki&&ki<rs[1]&&bs[0]%2!==bs[1]%2)break;
+    }while(true);
+    return rank;
+  }
+  b[7]=randomBackRank().map(p=>'w'+p);
+  b[0]=randomBackRank().map(p=>'b'+p);
+  return b;
+}
+
+// CHAOS: all pieces placed randomly
+function initBoardChaos(){
+  const b=Array.from({length:8},()=>Array(8).fill(null));
+  const wPieces=['wK','wQ','wR','wR','wB','wB','wN','wN','wP','wP','wP','wP','wP','wP','wP','wP'];
+  const bPieces=['bK','bQ','bR','bR','bB','bB','bN','bN','bP','bP','bP','bP','bP','bP','bP','bP'];
+  const cells=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)cells.push([r,c]);
+  shuffle(cells);
+  [...wPieces,...bPieces].forEach((p,i)=>{const[r,c]=cells[i];b[r][c]=p;});
+  return b;
+}
+
+// Challenges pool for Défi mode
+const CHALLENGE_POOL=[
+  {id:'cap3',label:'Capturer 3 pièces',target:3,pts:50,type:'capture',count:0},
+  {id:'capQ',label:'Capturer la Dame adverse',target:1,pts:80,type:'captureQ',count:0},
+  {id:'promo',label:'Promouvoir un pion',target:1,pts:60,type:'promo',count:0},
+  {id:'combo2',label:'Faire 2 combos',target:2,pts:40,type:'combo',count:0},
+  {id:'moves5',label:'Jouer 5 coups en un tour',target:5,pts:45,type:'movesInTurn',count:0},
+  {id:'capN',label:'Capturer un Cavalier',target:1,pts:30,type:'captureN',count:0},
+  {id:'cap5',label:'Capturer 5 pièces',target:5,pts:70,type:'capture',count:0},
+  {id:'gel2',label:'Geler 2 fois',target:2,pts:35,type:'gel',count:0},
+];
+function generateChallenges(){
+  const pool=[...CHALLENGE_POOL].map(c=>({...c,count:0,done:false}));
+  shuffle(pool);return pool.slice(0,3);
+}
+function updateChallenge(type,val=1){
+  if(gameMode!=='defi')return;
+  let updated=false;
+  challenges.forEach(c=>{
+    if(c.done)return;
+    if(c.type===type&&c.type!=='movesInTurn'){c.count=Math.min(c.target,c.count+val);if(c.count>=c.target){c.done=true;challengeScore+=c.pts;addLog(`🎯 Défi accompli : ${c.label} ! +${c.pts}pts`,'sp');updated=true;}}
+    if(c.type==='movesInTurn'){c.count=Math.max(c.count,val);if(c.count>=c.target&&!c.done){c.done=true;challengeScore+=c.pts;addLog(`🎯 Défi accompli : ${c.label} ! +${c.pts}pts`,'sp');updated=true;}}
+  });
+  if(updated||type==='render')renderChallenges();
+}
+function renderChallenges(){
+  const el=document.getElementById('challenge-list');if(!el)return;
+  el.innerHTML=challenges.map(c=>`<div class="challenge-item${c.done?' done':''}"><span>${c.done?'✅':'🎯'}</span><span style="flex:1">${c.label}</span><div class="challenge-bar"><div class="challenge-fill" style="width:${Math.min(100,(c.count/c.target)*100)}%"></div></div><span class="challenge-pts">${c.pts}p</span></div>`).join('');
+  document.getElementById('challenge-score-val').textContent=challengeScore;
+}
+
+// Mode team setters
+function setKOTeam(t){koTeam=t;document.getElementById('ko-w').classList.toggle('active',t==='w');document.getElementById('ko-b').classList.toggle('active',t==='b');}
+function setDefiTeam(t){defiTeam=t;document.getElementById('defi-w').classList.toggle('active',t==='w');document.getElementById('defi-b').classList.toggle('active',t==='b');}
+function setChaosTeam(t){chaosTeam=t;document.getElementById('chaos-w').classList.toggle('active',t==='w');document.getElementById('chaos-b').classList.toggle('active',t==='b');}
+function setFantomeTeam(t){fantomeTeam=t;document.getElementById('fantome-w').classList.toggle('active',t==='w');document.getElementById('fantome-b').classList.toggle('active',t==='b');}
+function startKO(){soloTeam=koTeam;playerNames=soloTeam==='w'?{w:'Vous ♔',b:'IA ♚'}:{w:'IA ♔',b:'Vous ♚'};showGame();resetGame();}
+function startDefi(){soloTeam=defiTeam;playerNames=soloTeam==='w'?{w:'Vous ♔',b:'IA ♚'}:{w:'IA ♔',b:'Vous ♚'};showGame();resetGame();}
+function startChaos(){soloTeam=chaosTeam;playerNames=soloTeam==='w'?{w:'Vous ♔',b:'IA ♚'}:{w:'IA ♔',b:'Vous ♚'};showGame();resetGame();}
+function startSurvie(){soloTeam='w';playerNames={w:'Vous ♔',b:'Vagues ♚'};showGame();resetGame();}
+function startFantome(){soloTeam=fantomeTeam;playerNames=soloTeam==='w'?{w:'Vous ♔',b:'Fantômes ♚'}:{w:'Fantômes ♔',b:'Vous ♚'};showGame();resetGame();}
+function initHP(){
+  pieceHP={};
+  if(!opts.hp)return;
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const p=board[r][c];
+    if(p)pieceHP[`${r},${c}`]=MAX_HP[p[1]]||1;
+  }
+}
+function initKingShields(){
+  kingShielded={w:opts['king-shield'],b:opts['king-shield']};
+}
+function generateZones(){
+  specialZones={traps:new Set(),boosts:new Set(),regens:new Set()};
+  if(!opts.zones)return;
+  const candidates=[];
+  for(let r=2;r<6;r++)for(let c=0;c<8;c++)candidates.push(`${r},${c}`);
+  shuffle(candidates);
+  for(let i=0;i<3;i++)specialZones.boosts.add(candidates[i]);
+  if(opts.regen)for(let i=3;i<5;i++)specialZones.regens.add(candidates[i]);
+}
+
+function resetGame(){
+  stopBlitz();
+  // Board init based on mode
+  if(gameMode==='ko')board=initBoardKO();
+  else if(gameMode==='chaos')board=initBoardChaos();
+  else board=initBoard();
+  deck=buildDeck();controlling='w';movesLeft=0;
+  selectedCell=null;validMoves=[];waitingDraw=true;awaitingWild=false;
+  newPawnCells=new Set();spawnAnimCells=new Map();aiPaused=false;
+  shieldedCell=null;awaitingSwap=false;swapFirst=null;
+  awaitingGel=false;awaitingVol=false;awaitingMeteor=false;
+  frozenCells=new Set();frozenTurns={};
+  capturedByWhite=[];capturedByBlack=[];
+  lastCardColor=null;
+  // Hand system reset
+  handW=[];handB=[];selectedHandIdx=-1;
+  stackTotal=0;unoCalled=false;requiredColor=null;drawnThisTurn=false;window._pendingWildColor=null;window._pendingRequiredColor=null;
+  discardPile=[];
+  // Deal 7 cards to each player
+  for(let i=0;i<7;i++){
+    if(deck.length===0)deck=buildDeck();
+    handW.push(deck.pop());
+    if(deck.length===0)deck=buildDeck();
+    handB.push(deck.pop());
+  }
+  // New mode reset
+  challengeScore=0;challenges=gameMode==='defi'?generateChallenges():[];
+  survivalTurns=0;survivalWave=1;
+  ghostMode=gameMode==='fantome';
+  initHP();initKingShields();generateZones();
+  document.getElementById('modal').classList.remove('on');
+  document.getElementById('pass-ov').classList.remove('on');
+  document.getElementById('wild-pick').style.display='none';
+  document.getElementById('meteor-pick').style.display='none';
+  document.getElementById('card-display').innerHTML='';currentCard=null;
+  discardPile=[];updateDiscardDisplay();
+  document.getElementById('log').innerHTML='';
+  document.getElementById('spawn-indicator').style.display='none';
+  document.getElementById('ai-thinking').classList.remove('on');
+  document.getElementById('effect-status').style.display='none';
+  updateCaptureDisplay();updateHPDisplay();
+  // Special panels
+  document.getElementById('challenge-panel').style.display=gameMode==='defi'?'flex':'none';
+  document.getElementById('survival-panel').style.display=gameMode==='survie'?'flex':'none';
+  if(gameMode==='defi')renderChallenges();
+  if(gameMode==='survie'){document.getElementById('survival-wave-label').textContent='Vague 1';document.getElementById('survival-turns').textContent='0';}
+  // Zone legend
+  const showZ=opts.zones;
+  document.getElementById('legend-zones').style.display=showZ?'':'none';
+  document.getElementById('legend-zone-boost').style.display=showZ?'flex':'none';
+  document.getElementById('legend-zone-regen').style.display=showZ?'flex':'none';
+  const ml={solo:'🤖 SOLO vs IA',local:'🤝 LOCAL 1v1',online:'🌐 EN LIGNE',ko:'🎲 MODE KO',defi:'🎯 MODE DÉFI',chaos:'🌀 MODE CHAOS',survie:'⏱️ MODE SURVIE',fantome:'👻 MODE FANTÔME'};
+  const isLocal1v1=soloTeam==='local1v1';
+  let badge=ml[gameMode]||'⚡ UNO CHESS';
+  if(isLocal1v1&&gameMode!=='local')badge='🤝 LOCAL '+((ml[gameMode]||'').replace(/^[^ ]+ /,''));
+  document.getElementById('mode-badge').textContent=badge;
+  const aiModes=['solo','ko','defi','chaos','survie','fantome'];
+  const isAiMode=aiModes.includes(gameMode)&&!isLocal1v1;
+  const aiIsBlack=isAiMode&&soloTeam==='w';
+  const aiIsWhite=isAiMode&&soloTeam==='b';
+  document.getElementById('bai-top').style.display=aiIsBlack?'inline':'none';
+  document.getElementById('bai-bot').style.display=aiIsWhite?'inline':'none';
+  updateTurnUI();updateDeckInfo();setCounter(0);renderBoard();updateBanners();
+  if(gameMode==='local'||isLocal1v1){btnEnabled(false);setTimeout(()=>showPassScreen(),200);}
+  else if(onlineConnected){
+    if(myRole==='host'){setStatus('🃏 Tirez une carte pour commencer !');btnEnabled(true);startBlitz();}
+    else{setStatus('⏳ Tour adversaire...');btnEnabled(false);}
+  }
+  else if(isAITurn()){setStatus('🤖 L\'IA commence...');btnEnabled(false);scheduleAI();}
+  else{setStatus('🃏 Choisissez une carte à jouer !');btnEnabled(true);renderHand();startBlitz();}
+}
+
+// ══════════════════════════════════════
+// HAND SYSTEM HELPERS
+// ══════════════════════════════════════
+function currentHand(){return controlling==='w'?handW:handB;}
+
+function drawFromDeck(hand,n=1){
+  for(let i=0;i<n;i++){
+    if(deck.length===0){deck=buildDeck();addLog('♻️ Paquet mélangé !','sp');}
+    hand.push(deck.pop());
+  }
+}
+
+// NOTE: In real UNO, hands are NOT replenished every turn.
+// Players draw only via the draw button or card effects.
+// replenishHand is intentionally disabled.
+function replenishHand(){
+  // No auto-replenish — players must draw manually like real UNO
+}
+
+// ── RENDER HAND ──
+function renderHand(){
+  const el=document.getElementById('hand-cards');
+  const unoBox=document.getElementById('uno-btn-box');
+  const unoCalledBox=document.getElementById('uno-called-box');
+  const ccBox=document.getElementById('color-constraint-box');
+  const sbBox=document.getElementById('stack-badge-box');
+  const handLbl=document.getElementById('hand-label');
+  if(!el)return;
+
+  const hand=currentHand();
+  const isHuman=!isAITurn()&&isMyTurn();
+
+  // ── Color constraint banner ──
+  if(requiredColor&&waitingDraw){
+    const cmap={red:'#FF4D6D',blue:'#48CAE4',green:'#06D6A0',yellow:'#FFBE0B'};
+    const cname={red:'Rouge 🔴',blue:'Bleu 🔵',green:'Vert 🟢',yellow:'Jaune 🟡'};
+    const ccls={red:'cc-red',blue:'cc-blue',green:'cc-green',yellow:'cc-yellow'};
+    const cls=ccls[requiredColor]||'cc-red';
+    ccBox.style.display='flex';
+    ccBox.innerHTML=`<div class="color-constraint ${cls}">
+      <div class="color-dot" style="background:${cmap[requiredColor]||'#ccc'}"></div>
+      Couleur imposée : <b>${cname[requiredColor]||requiredColor}</b>
+    </div>`;
+  } else { ccBox.style.display='none'; }
+
+  // ── Stack banner — hidden (no more stacking) ──
+  if(sbBox)sbBox.style.display='none';
+
+  // ── UNO button ──
+  if(isHuman&&hand.length===1&&waitingDraw&&!unoCalled){
+    unoBox.style.display='block';
+    unoBox.innerHTML=`<button class="uno-btn" onclick="callUno()">🃏 UNO !</button>`;
+  } else { unoBox.style.display='none'; }
+  if(unoCalled&&hand.length===1){
+    unoCalledBox.style.display='block';
+    unoCalledBox.innerHTML=`<div class="uno-called">✅ UNO appelé !</div>`;
+  } else { unoCalledBox.style.display='none'; }
+
+  handLbl.textContent=isHuman
+    ? `Votre main (${hand.length} carte${hand.length>1?'s':''})`
+    : `Main adverse (${hand.length} carte${hand.length>1?'s':''})`;
+
+  const CARD_COLOR_CLASS={red:'hc-red',blue:'hc-blue',green:'hc-green',yellow:'hc-yellow',
+    wild:'hc-wild',shield:'hc-shield',swap:'hc-swap',res:'hc-res',gel:'hc-gel',vol:'hc-vol',meteor:'hc-meteor'};
+  const CARD_LABELS={Skip:'⏭','⇄':'↺','+2':'+2',Wild:'★','+4':'+4',
+    '🛡️':'🛡️','🔀':'🔀','✨':'✨','❄️':'❄️','🪄':'🪄','☄️':'☄️'};
+  const CARD_SUBTEXT={'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9',
+    Skip:'skip','⇄':'rev','+2':'+2',Wild:'wild','+4':'+4',
+    '🛡️':'shield','🔀':'swap','✨':'res','❄️':'gel','🪄':'vol','☄️':'meteor'};
+
+  // Show card backs for AI/opponent
+  if(!isHuman){
+    el.innerHTML=hand.map(()=>
+      `<div class="hand-card" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:#3a3a5c;cursor:default;">
+        <span class="hcv" style="font-size:1rem;">🃏</span>
+      </div>`
+    ).join('');
+    updateDeckInfo();
+    return;
+  }
+
+  // Playability: if color constraint → cards NOT matching requiredColor are greyed
+  el.innerHTML=hand.map((card,i)=>{
+    const cls=CARD_COLOR_CLASS[card.color]||'hc-wild';
+    const isSelected=selectedHandIdx===i;
+    let unplayable=false;
+    let tooltip=`${card.color} ${card.value}`;
+    if(requiredColor&&!isPlayable(card)){
+      unplayable=true; tooltip='Couleur incorrecte — même valeur ou même couleur requis';
+    }
+    return `<div class="hand-card ${cls}${isSelected?' selected-card':''}${unplayable?' unplayable':''}"
+      onclick="selectHandCard(${i})" title="${tooltip}">
+      <span class="hcv">${CARD_LABELS[card.value]||card.value}</span>
+      <span class="hcs">${CARD_SUBTEXT[card.value]||card.color}</span>
+    </div>`;
+  }).join('');
+
+  updateDeckInfo();
+
+  // Show/hide draw button
+  const drawPassBtn=document.getElementById('draw-pass-btn');
+  if(drawPassBtn){
+    const showDraw=isHuman&&waitingDraw&&!awaitingWild&&!awaitingGel&&!awaitingVol&&!awaitingMeteor;
+    drawPassBtn.style.display=showDraw?'flex':'none';
+  }
+}
+
+// Render opponent's hand face-down (for local pass screen)
+function renderOpponentHand(){
+  const el=document.getElementById('hand-cards');
+  const handLbl=document.getElementById('hand-label');
+  if(!el)return;
+  // Show backs of the NEXT player's cards
+  const nextHand=(controlling==='w')?handB:handW;
+  handLbl.textContent=`Main adverse (${nextHand.length} carte${nextHand.length!==1?'s':''}) — cachée`;
+  el.innerHTML=nextHand.map(()=>
+    `<div class="hand-card" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:#3a3a5c;cursor:default;">
+      <span class="hcv" style="font-size:1rem;">🃏</span>
+    </div>`
+  ).join('');
+  ['draw-pass-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='none';});
+  ['uno-btn-box','uno-called-box','color-constraint-box','stack-badge-box'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='none';});
+  updateDeckInfo();
+}
+
+function callUno(){
+  unoCalled=true;
+  addLog('🃏 UNO !','sp');
+  renderHand();
+}
+
+// ── SELECT & PLAY ──
+function selectHandCard(idx){
+  if(!waitingDraw||awaitingWild||awaitingGel||awaitingVol||awaitingMeteor)return;
+  if(!isMyTurn()||isAITurn())return;
+  const hand=currentHand();
+  const card=hand[idx];
+  if(!card)return;
+
+  // COLOR CONSTRAINT: mauvaise couleur ET pas même valeur → pioche 1 et passe
+  if(requiredColor&&!isPlayable(card)){
+    // Guest delegates to host
+    if(onlineConnected&&myRole==='guest'){guestAction({type:'forcedrawn'});return;}
+    requiredColor=null;
+    addLog('🌈 Couleur imposée ! Vous piochez 1 carte et passez.','sp');
+    drawFromDeck(hand,1);renderHand();syncState();
+    setTimeout(()=>endTurn(),1200);
+    return;
+  }
+
+  // Guest delegates card play to host
+  if(onlineConnected&&myRole==='guest'){
+    selectedHandIdx=idx;renderHand(); // visual feedback only
+    setTimeout(()=>{guestAction({type:'playcard',idx});selectedHandIdx=-1;renderHand();},180);
+    return;
+  }
+
+  selectedHandIdx=idx;
+  renderHand();
+  setTimeout(()=>playHandCard(idx),180);
+}
+
+function playHandCard(idx){
+  const hand=currentHand();
+  if(idx<0||idx>=hand.length)return;
+  const card=hand.splice(idx,1)[0]; // Remove card from hand
+  selectedHandIdx=-1;
+  drawnThisTurn=false;
+  const dbtn=document.getElementById('draw-pass-btn');
+  if(dbtn){dbtn.textContent='🃏 Piocher';dbtn.style.background='rgba(255,180,194,.15)';dbtn.style.color='var(--muted)';}
+
+  if(hand.length>1)unoCalled=false;
+  // Note: no UNO penalty — the UNO button is optional and celebratory only
+
+  // Set color constraint for OPPONENT: they must match the color just played
+  // Special cards (shield, swap, res, gel, vol, meteor, wild) don't impose a color
+  // NOTE: we store this as _pendingRequiredColor — it only applies at the START of opponent's turn (endTurn)
+  // This prevents the constraint from blocking the CURRENT player's subsequent moves this turn
+  const specialColors=['shield','swap','res','gel','vol','meteor','wild'];
+  if(!specialColors.includes(card.color)){
+    window._pendingRequiredColor=card.color; // opponent must match this on their next draw
+  } else {
+    window._pendingRequiredColor=null; // wild sets it separately via _pendingWildColor
+  }
+  // Clear any existing constraint — the current player is playing, so constraint is consumed
+  requiredColor=null;
+
+  // Combo check (only for number cards)
+  if(opts.combo&&lastCardColor&&card.color===lastCardColor&&card.type==='number'){
+    card._comboBonus=true;
+    addLog('🔥 COMBO ! +1 coup bonus !','sp');
+    if(gameMode==='defi'&&controlling===soloTeam)updateChallenge('combo');
+  }
+  lastCardColor=['shield','swap','res','gel','vol','meteor'].includes(card.color)?null:card.color;
+  currentCard=card;
+  discardPile.push(card); // Add to discard pile
+  stopBlitz();
+  displayCard(card);
+  updateDiscardDisplay(); // Show top of discard pile
+  waitingDraw=false;
+
+  if(onlineConnected)sendOnline({type:'showcardDrawn',card});
+
+  renderHand();
+  updateDeckInfo();
+
+  // WIN: empty hand = UNO Chess win!
+  if(hand.length===0){
+    const winner=controlling==='w'?playerNames.w:playerNames.b;
+    addLog(`🃏 ${winner} n'a plus de cartes — VICTOIRE !`,'sp');
+    renderBoard();syncState();
+    if(onlineConnected&&myRole==='host')sendOnline({type:'gameover',winner,reason:'hand'});
+    setTimeout(()=>showEndGameCards(winner),600);
+    return;
+  }
+
+  processCard(card,true);
+  syncState();
+}
+
+// ── DRAW/PASS BUTTON (when no playable card) ──
+// State: has the player already drawn this turn?
+let drawnThisTurn=false;
+
+function drawAndPass(){
+  if(!waitingDraw||isAITurn()||!isMyTurn())return;
+
+  // Guest delegates to host
+  if(onlineConnected&&myRole==='guest'){
+    if(!drawnThisTurn){
+      drawnThisTurn=true; // local flag to track state for button text
+      const btn=document.getElementById('draw-pass-btn');
+      if(btn){btn.textContent='⏭ Passer';btn.style.background='rgba(255,77,109,.12)';btn.style.color='var(--hot-pink)';}
+      guestAction({type:'drawpass',step:'draw'});
+    } else {
+      drawnThisTurn=false;
+      guestAction({type:'drawpass',step:'pass'});
+    }
+    return;
+  }
+
+  const hand=currentHand();
+  if(!drawnThisTurn){
+    // First press: draw 1 card
+    drawFromDeck(hand,1);
+    drawnThisTurn=true;
+    const drew=hand[hand.length-1];
+    addLog(`🃏 Pioche : ${drew.color} ${drew.value}`,'sp');
+    setStatus('🃏 Carte piochée — jouez-la ou passez !');
+    const btn=document.getElementById('draw-pass-btn');
+    if(btn){btn.textContent='⏭ Passer';btn.style.background='rgba(255,77,109,.12)';btn.style.color='var(--hot-pink)';}
+    renderHand();syncState();
+  } else {
+    // Second press: pass turn
+    drawnThisTurn=false;
+    requiredColor=null;
+    window._pendingWildColor=null;
+    window._pendingRequiredColor=null;
+    addLog('⏭ Tour passé (carte piochée, pas jouée).','sp');
+    renderHand();syncState();endTurn();
+  }
+}
+
+// ── AI HAND PLAY ──
+function aiPlayFromHand(){
+  const hand=currentHand();
+  if(!hand.length){endTurn();return;}
+
+  // Color constraint: play matching color, wild, special, or same value — or draw+pass
+  let candidates=hand;
+  const specialCardColors=['shield','swap','res','gel','vol','meteor'];
+  if(requiredColor){
+    const matching=hand.filter(c=>isPlayable(c));
+    if(matching.length){candidates=matching;}
+    else{
+      // AI has no matching card → draw 1, consume constraint, end turn
+      requiredColor=null;
+      drawFromDeck(hand,1);
+      addLog('🤖 IA pioche (couleur imposée) et passe.','sp');
+      renderHand();syncState();
+      setTimeout(()=>endTurn(),800);
+      return;
+    }
+  }
+
+  // Priority: wild4 > wild > draw2 > special > high number
+  const priority=c=>{
+    if(c.type==='wild4')return 100;
+    if(c.type==='wild')return 90;
+    if(c.type==='draw2')return 80;
+    if(['shield','gel','vol','meteor','res'].includes(c.type))return 60;
+    return parseInt(c.value)||0;
+  };
+  candidates=[...candidates].sort((a,b)=>priority(b)-priority(a));
+  playHandCard(hand.indexOf(candidates[0]));
+}
+
+// ══════════════════════════════════════
+// DRAW / CARD PROCESSING
+// ══════════════════════════════════════
+function drawCard(fromGuest=false){
+  console.log('[DRAW] drawCard called. fromGuest='+fromGuest+' myRole='+myRole+' controlling='+controlling+' isMyTurn='+isMyTurn()+' waitingDraw='+waitingDraw);
+  if(!waitingDraw||awaitingWild||awaitingGel||awaitingVol||awaitingMeteor){
+    console.log('[DRAW] Blocked: waitingDraw='+waitingDraw);
+    return;
+  }
+  if(onlineConnected&&!isMyTurn()&&!fromGuest){
+    console.log('[DRAW] Blocked: not my turn and not fromGuest');
+    return;
+  }
+  // Guest sends action to host who executes and syncs back
+  if(onlineConnected&&myRole==='guest'&&!fromGuest){
+    console.log('[DRAW] Guest sends draw action to host');
+    guestAction({type:'draw'});
+    return;
+  }
+
+  // For AI turns: AI plays from its own hand
+  if(isAITurn()){
+    aiPlayFromHand();
+    return;
+  }
+
+  // For human turns: just render hand so they can pick
+  // (card selection happens via selectHandCard)
+  renderHand();
+  setStatus('🃏 Choisissez une carte à jouer !');
+  console.log('[DRAW] Human picks from hand, '+currentHand().length+' cards available');
+}
+
+function processCard(card,isMine=true,stackAdded=0){
+  const ci=COLOR_ICON[card.color]||'🃏';
+
+  if(card.type==='number'){
+    const n=parseInt(card.value)||0;
+    movesLeft=n;
+    addLog(`${ci} ${card.value} — ${n===0?'Tour passé !':n+' coup(s).'}`);
+    if(n===0){setStatus(`${ci} 0 — Tour passé !`);if(isMine)syncState();setTimeout(()=>endTurn(),1400);}
+    else{setStatus(`${ci} ${n} coup(s) à jouer !`);setCounter(movesLeft);if(isMine)syncState();if(isAITurn())scheduleAIMoves();}
+
+  } else if(card.type==='skip'){
+    addLog(`${ci} Skip — Adversaire passe son tour !`,'sp');
+    setStatus('⏭ Skip joué — tour de l\'adversaire passé automatiquement !');
+    movesLeft=0;setCounter(0);
+    if(isMine)syncState();
+    // End current turn, then immediately skip opponent's turn too
+    setTimeout(()=>{
+      endTurn(true); // switches to opponent, skipNext=true suppresses their play
+      syncState();   // tell guest their turn is being skipped
+      // After endTurn, controlling is now opponent — skip them immediately
+      setTimeout(()=>endTurn(),600);
+    },1000);
+
+  } else if(card.type==='reverse'){
+    // Reverse : les deux joueurs échangent leurs pièces (blanc joue les noirs et vice versa)
+    const prevCtrl=controlling;
+    // Inverser les équipes : blanc ↔ noir
+    controlling=controlling==='w'?'b':'w';
+    soloTeam=soloTeam==='w'?'b':'w';
+    // Inverser aussi les noms
+    const tmpName=playerNames.w;playerNames.w=playerNames.b;playerNames.b=tmpName;
+    movesLeft=1;setCounter(movesLeft);
+    const newName=controlling==='w'?playerNames.w:playerNames.b;
+    addLog(`⇄ Reverse — camps inversés ! Tu joues maintenant les ${controlling==='w'?'Blancs ♔':'Noirs ♚'} !`,'rev');
+    setStatus(`⇄ Camps inversés ! Tu joues ${controlling==='w'?'Blancs ♔':'Noirs ♚'} — ${movesLeft} coup(s) !`);
+    updateTurnUI();updateBanners();renderBoard();renderHand();
+    if(isMine)syncState();
+
+  } else if(card.type==='draw2'){
+    // +2 : l'adversaire pioche 2 cartes, MON équipe reçoit 2 pions, je joue 1 coup
+    const oppHand=controlling==='w'?handB:handW;
+    drawFromDeck(oppHand,2);
+    const spawned2=spawnPawns(2,controlling,isMine);
+    movesLeft=1;setCounter(movesLeft);
+    addLog(`${ci} +2 — Adversaire pioche 2 cartes, ${spawned2} pion(s) pour toi !`,'sp');
+    setStatus(`➕2 ! Adversaire pioche 2 + ${spawned2} pion(s) pour toi. Jouez 1 coup.`);
+    if(spawned2>0)showSpawnInd(spawned2,controlling);
+    renderHand();
+    if(isMine)syncState();if(isAITurn())scheduleAIMoves();
+
+  } else if(card.type==='wild'){
+    addLog('🌈 Wild !','sp');movesLeft=1;setCounter(movesLeft);awaitingWild=true;
+    if(!isAITurn()){showWildColorPicker();}
+    setStatus('🌈 Wild — Choisissez une couleur à imposer !');if(isMine)syncState();
+    if(isAITurn())setTimeout(()=>pickTeam(controlling,true),700);
+
+  } else if(card.type==='wild4'){
+    // +4 : l'adversaire pioche 4 cartes, MON équipe reçoit 4 pions
+    const oppHand4=controlling==='w'?handB:handW;
+    drawFromDeck(oppHand4,4);
+    const spawned4=spawnPawns(4,controlling,isMine);
+    movesLeft=1;setCounter(movesLeft);awaitingWild=true;
+    addLog(`🌈 +4 ! Adversaire pioche 4 cartes, ${spawned4} pion(s) pour toi !`,'sp');
+    if(spawned4>0)showSpawnInd(spawned4,controlling);
+    if(!isAITurn()){showWildColorPicker();}
+    setStatus(`🌈 +4 ! Adversaire pioche 4 + ${spawned4} pion(s). Choisissez une couleur !`);
+    renderHand();
+    if(isMine)syncState();
+    if(isAITurn())setTimeout(()=>pickTeam(controlling,true),700);
+
+  } else if(card.type==='shield'){
+    movesLeft=1;setCounter(movesLeft);
+    addLog('🛡️ Bouclier !','sp');setStatus('🛡️ Cliquez une pièce à protéger, puis jouez !');
+    shieldedCell=null;updateEffectStatus();if(isMine)syncState();
+    if(isAITurn()){aiShieldBestPiece();scheduleAIMoves();}
+
+  } else if(card.type==='swap'){
+    movesLeft=0;addLog('🔀 Échange !','rev');
+    doSwapPawns(controlling,isMine);
+    setStatus('🔀 Pions échangés !');if(isMine)syncState();
+    setTimeout(()=>endTurn(),1500);
+
+  } else if(card.type==='res'){
+    const done=doResurrect(controlling);
+    movesLeft=done?1:0;
+    addLog(`✨ Résurrection — ${done?'pièce rappelée !':'aucune pièce à rappeler.'}`,'sp');
+    setStatus(done?'✨ Pièce rappelée ! Jouez 1 coup.':'✨ Pas de pièce à rappeler.');
+    if(done){setCounter(movesLeft);if(isMine)syncState();if(isAITurn())scheduleAIMoves();}
+    else setTimeout(()=>endTurn(),1400);
+
+  } else if(card.type==='gel'){
+    movesLeft=1;setCounter(movesLeft);
+    addLog('❄️ Gel — Cliquez une pièce adverse à geler !','gel');
+    setStatus('❄️ Cliquez une pièce adverse à geler !');
+    awaitingGel=true;updateEffectStatus();if(isMine)syncState();
+    if(isAITurn()){aiGelBestPiece();awaitingGel=false;scheduleAIMoves();}
+
+  } else if(card.type==='vol'){
+    movesLeft=1;setCounter(movesLeft);
+    addLog('🪄 Vol — Cliquez une pièce adverse à contrôler !','sp');
+    setStatus('🪄 Cliquez une pièce adverse pour jouer avec !');
+    awaitingVol=true;updateEffectStatus();if(isMine)syncState();
+    if(isAITurn()){aiVolBestPiece();awaitingVol=false;scheduleAIMoves();}
+
+  } else if(card.type==='meteor'){
+    movesLeft=0;addLog('☄️ Météore — Choisissez une colonne !','sp');
+    setStatus('☄️ Choisissez une colonne à détruire !');
+    awaitingMeteor=true;
+    if(!isAITurn())document.getElementById('meteor-pick').style.display='block';
+    else setTimeout(()=>doMeteor(Math.floor(Math.random()*8)),700);
+  }
+}
+
+function pickTeam(team,isMine=true,chosenColor=null){
+  // Guest delegates to host
+  if(onlineConnected&&myRole==='guest'&&isMine){
+    guestAction({type:'pickwild',team:controlling,color:chosenColor||window._wildColor||null});
+    document.getElementById('wild-pick').style.display='none';
+    window._wildColor=null;
+    return;
+  }
+
+  // Ne change PAS d'équipe — Wild/+4 impose juste une couleur à l'adversaire
+  awaitingWild=false;
+  document.getElementById('wild-pick').style.display='none';
+
+  // If no color chosen yet, prompt human or let AI pick
+  if(!chosenColor){
+    if(isAITurn()){
+      // AI picks the color it has most of
+      const hand=currentHand();
+      const counts={red:0,blue:0,green:0,yellow:0};
+      hand.forEach(c=>{if(counts[c.color]!==undefined)counts[c.color]++;});
+      chosenColor=Object.keys(counts).reduce((a,b)=>counts[a]>=counts[b]?a:b);
+      if(!chosenColor)chosenColor='red';
+    } else {
+      // Show color picker to human — will call pickTeam again with color
+      showWildColorPicker();
+      const nm=team==='w'?playerNames.w:playerNames.b;
+      addLog(`🌈 Wild → ${nm} — Choisissez une couleur !`,'sp');
+      updateTurnUI();updateBanners();renderBoard();
+      if(isMine)syncState();
+      return; // wait for human to pick color
+    }
+  }
+
+  // Color is known — apply constraint and resume play
+  requiredColor=null; // will be set AFTER this turn ends (wild imposes on next turn's opponent)
+  // Actually: the color chosen by the Wild player becomes the "active color"
+  // The NEXT player must match it. Store as lastCardColor and set requiredColor for next endTurn.
+  lastCardColor=chosenColor;
+  // We don't set requiredColor here — it applies to the OPPONENT on their next turn draw.
+  // Instead, we store it and endTurn will propagate it.
+  // For clarity: when the Wild player's turn ends, the opponent sees requiredColor.
+  // But the Wild player themselves needs to play their movesLeft moves first.
+  // Solution: set requiredColor now; it will stay until opponent draws and plays.
+  // But the Wild player is about to move too — they chose a color to CONSTRAIN the opponent's next turn.
+  // So we keep requiredColor = chosenColor but it should NOT block the current player.
+  // We use a separate variable _wildConstraintColor and apply it at endTurn.
+  window._pendingWildColor=chosenColor;
+
+  const cname={red:'🔴 Rouge',blue:'🔵 Bleu',green:'🟢 Vert',yellow:'🟡 Jaune'};
+  const nm=team==='w'?playerNames.w:playerNames.b;
+  addLog(`🌈 Wild → ${nm} | Couleur imposée : ${cname[chosenColor]||chosenColor}`,'sp');
+  setStatus(`🌈 Contrôle : ${nm} ! ${movesLeft} coup(s) restant(s). Prochaine contrainte : ${cname[chosenColor]||chosenColor}`);
+  setCounter(movesLeft);
+  updateTurnUI();updateBanners();renderBoard();
+  if(isMine)syncState();
+  if(isAITurn())scheduleAIMoves();
+  else if(movesLeft<=0){
+    // No moves to play (e.g. 0 from processCard) — end turn immediately
+    setTimeout(()=>endTurn(),800);
+  }
+}
+
+function showWildColorPicker(){
+  const el=document.getElementById('wild-pick');
+  el.style.display='flex';
+  el.style.flexDirection='column';
+  el.style.gap='5px';
+  el.innerHTML=`
+    <div style="font-size:.6rem;color:var(--muted);text-align:center;margin-bottom:2px;">Choisissez une couleur imposée à l'adversaire :</div>
+    <div style="display:flex;gap:4px;justify-content:center;" id="wild-color-row">
+      <button onclick="setWildColor('red')" style="padding:7px 10px;border:2px solid #FF4D6D;border-radius:7px;background:rgba(255,77,109,.15);cursor:pointer;font-size:.85rem;">🔴</button>
+      <button onclick="setWildColor('blue')" style="padding:7px 10px;border:2px solid #48CAE4;border-radius:7px;background:rgba(72,202,228,.15);cursor:pointer;font-size:.85rem;">🔵</button>
+      <button onclick="setWildColor('green')" style="padding:7px 10px;border:2px solid #06D6A0;border-radius:7px;background:rgba(6,214,160,.15);cursor:pointer;font-size:.85rem;">🟢</button>
+      <button onclick="setWildColor('yellow')" style="padding:7px 10px;border:2px solid #FFBE0B;border-radius:7px;background:rgba(255,190,11,.15);cursor:pointer;font-size:.85rem;">🟡</button>
+    </div>
+    <div id="wild-color-chosen" style="font-size:.58rem;text-align:center;color:var(--muted);">Aucune couleur choisie</div>
+  `;
+  window._wildColor=null;
+}
+function setWildColor(color){
+  window._wildColor=color;
+  const cname={red:'🔴 Rouge',blue:'🔵 Bleu',green:'🟢 Vert',yellow:'🟡 Jaune'};
+  document.getElementById('wild-color-chosen').textContent='Couleur : '+(cname[color]||color);
+  document.querySelectorAll('#wild-color-row button').forEach(b=>b.style.transform='');
+  event.target.style.transform='scale(1.2)';
+  // Confirm immediately — no team choice needed, we keep the current player
+  document.getElementById('wild-pick').style.display='none';
+  pickTeam(controlling,true,color);
+}
+function pickTeamFull(team){
+  window._wildTeam=team;
+  tryConfirmWild();
+}
+function tryConfirmWild(){
+  if(window._wildTeam&&window._wildColor){
+    document.getElementById('wild-pick').style.display='none';
+    pickTeam(window._wildTeam,true,window._wildColor);
+  }
+}
+
+// ══════════════════════════════════════
+// SPECIAL CARD EFFECTS
+// ══════════════════════════════════════
+function doResurrect(color){
+  const deadList=color==='w'?capturedByWhite:capturedByBlack;
+  // Find the most valuable captured non-king piece
+  const sorted=[...deadList].filter(p=>p[1]!=='K').sort((a,b)=>PIECE_VALUE[b[1]]-PIECE_VALUE[a[1]]);
+  if(!sorted.length)return false;
+  const piece=sorted[0];
+  const idx=deadList.indexOf(piece);
+  deadList.splice(idx,1);
+  // Place on empty cell
+  const empties=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(!board[r][c])empties.push([r,c]);
+  if(!empties.length)return false;
+  shuffle(empties);
+  const [r,c]=empties[0];
+  board[r][c]=piece;
+  if(opts.hp)pieceHP[`${r},${c}`]=Math.max(1,Math.floor(MAX_HP[piece[1]]/2));
+  const k=`${r},${c}`;newPawnCells.add(k);spawnAnimCells.set(k,color);
+  renderBoard();setTimeout(()=>{newPawnCells.clear();renderBoard();},3000);
+  updateCaptureDisplay();
+  addLog(`✨ ${PIECE_NAME[piece[1]]} ressuscité en ${COL_LETTERS[c]}${8-r} !`,'sp');
+  return true;
+}
+
+function doSwapPawns(color,isMine=true){
+  const myPawns=[],theirPawns=[];
+  const opp=color==='w'?'b':'w';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    if(board[r][c]===color+'P')myPawns.push([r,c]);
+    if(board[r][c]===opp+'P')theirPawns.push([r,c]);
+  }
+  shuffle(myPawns);shuffle(theirPawns);
+  const n=Math.min(2,myPawns.length,theirPawns.length);
+  for(let i=0;i<n;i++){
+    const [mr,mc]=myPawns[i],[tr,tc]=theirPawns[i];
+    const hpA=pieceHP[`${mr},${mc}`],hpB=pieceHP[`${tr},${tc}`];
+    board[mr][mc]=opp+'P';board[tr][tc]=color+'P';
+    if(opts.hp){if(hpA!==undefined)pieceHP[`${tr},${tc}`]=hpA;if(hpB!==undefined)pieceHP[`${mr},${mc}`]=hpB;}
+  }
+  if(n>0){addLog(`🔀 ${n} pion(s) échangés !`,'rev');renderBoard();}
+}
+
+function doMeteor(col,isMine=true){
+  if(onlineConnected&&myRole==='guest'&&isMine){guestAction({type:'meteor',col});document.getElementById('meteor-pick').style.display='none';return;}
+  awaitingMeteor=false;
+  document.getElementById('meteor-pick').style.display='none';
+  const opp=controlling==='w'?'b':'w';
+  let killed=0;
+  for(let r=0;r<8;r++){
+    const p=board[r][col];
+    if(p){
+      if(p[1]==='K'){
+        // King gets meteor shield if enabled, otherwise dies
+        if(kingShielded[p[0]]){kingShielded[p[0]]=false;addLog(`☄️ Bouclier du Roi ${p[0]==='w'?'Blanc':'Noir'} brisé !`,'sp');}
+        else{
+          if(p[0]===opp)capturedByWhite.push(p);else capturedByBlack.push(p);
+          board[r][col]=null;delete pieceHP[`${r},${col}`];
+          renderBoard();syncState();
+          const w=controlling==='w'?playerNames.w:playerNames.b;showEndGame(w);return;
+        }
+      } else {
+        if(p[0]==='w')capturedByBlack.push(p);else capturedByWhite.push(p);
+        board[r][col]=null;delete pieceHP[`${r},${col}`];killed++;
+      }
+    }
+  }
+  addLog(`☄️ Colonne ${COL_LETTERS[col]} détruite ! ${killed} pièce(s) éliminée(s).`,'sp');
+  updateCaptureDisplay();renderBoard();syncState();
+  setTimeout(()=>endTurn(),1500);
+}
+
+function aiShieldBestPiece(){
+  const pieces=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(board[r][c]&&board[r][c][0]===controlling)pieces.push([r,c,PIECE_VALUE[board[r][c][1]]]);
+  pieces.sort((a,b)=>b[2]-a[2]);
+  if(pieces.length){const[sr,sc]=pieces[0];shieldedCell={r:sr,c:sc};renderBoard();updateEffectStatus();}
+}
+function aiGelBestPiece(){
+  const opp=controlling==='w'?'b':'w';
+  const pieces=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(board[r][c]&&board[r][c][0]===opp)pieces.push([r,c,PIECE_VALUE[board[r][c][1]]]);
+  pieces.sort((a,b)=>b[2]-a[2]);
+  if(pieces.length){const[fr,fc]=pieces[0];frozenCells.add(`${fr},${fc}`);frozenTurns[`${fr},${fc}`]=2;addLog(`❄️ IA gèle ${PIECE_NAME[board[fr][fc][1]]} en ${COL_LETTERS[fc]}${8-fr} 2 tours !`,'gel');renderBoard();}
+}
+function aiVolBestPiece(){
+  const opp=controlling==='w'?'b':'w';
+  const options=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    if(board[r][c]&&board[r][c][0]===opp&&!frozenCells.has(`${r},${c}`)){
+      for(const[tr,tc]of getLegalMoves(r,c)){
+        const score=board[tr][tc]&&board[tr][tc][0]===controlling?10+PIECE_VALUE[board[tr][tc][1]]:0;
+        options.push({fr:r,fc:c,tr,tc,score});
+      }
+    }
+  }
+  if(options.length){
+    options.sort((a,b)=>b.score-a.score);
+    const pick=options[0];
+    doMove(pick.fr,pick.fc,pick.tr,pick.tc,true);// stolen move
+  }
+}
+
+// ══════════════════════════════════════
+// AI
+// ══════════════════════════════════════
+function scheduleAI(delay=900){
+  if(aiPaused)return;
+  document.getElementById('ai-thinking').classList.add('on');
+  setTimeout(()=>{
+    if(aiPaused)return;
+    document.getElementById('ai-thinking').classList.remove('on');
+    aiPlayFromHand();
+  },delay);
+}
+function scheduleAIMoves(){
+  if(aiPaused||movesLeft<=0){if(movesLeft<=0&&!waitingDraw)endTurn();return;}
+  document.getElementById('ai-thinking').classList.add('on');
+  const diff=document.getElementById('opt-ai-diff').value;
+  const delay=diff==='easy'?900+Math.random()*600:diff==='hard'?300+Math.random()*200:600+Math.random()*400;
+  setTimeout(()=>{if(aiPaused)return;document.getElementById('ai-thinking').classList.remove('on');aiDoOneMove();},delay);
+}
+function aiDoOneMove(){
+  if(!isAITurn()||movesLeft<=0||waitingDraw||awaitingWild||awaitingGel||awaitingVol)return;
+  const diff=document.getElementById('opt-ai-diff').value;
+  const color=controlling,opp=color==='w'?'b':'w',options=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    if(board[r][c]&&board[r][c][0]===color&&!frozenCells.has(`${r},${c}`)){
+      for(const[tr,tc]of getLegalMoves(r,c)){
+        const target=board[tr][tc];
+        let score=0;
+        if(target&&target[0]===opp){
+          score=10+PIECE_VALUE[target[1]];
+          // Hard: also considers king shield
+          if(diff==='hard'&&target[1]==='K'&&kingShielded[opp])score-=8;
+          if(diff==='hard'&&shieldedCell&&shieldedCell.r===tr&&shieldedCell.c===tc)score-=5;
+        } else {
+          if(board[r][c][1]==='P')score+=color==='w'?(6-tr):(tr-1);
+          if(tc>=2&&tc<=5&&tr>=2&&tr<=5)score+=1;
+        }
+        if(diff==='easy')score+=Math.random()*10-5;// Easy: randomize
+        options.push({fr:r,fc:c,tr,tc,score});
+      }
+    }
+  }
+  if(!options.length){endTurn();return;}
+  options.sort((a,b)=>b.score-a.score);
+  let pick;
+  if(diff==='hard'){pick=options[0];}
+  else if(diff==='easy'){pick=options[Math.floor(Math.random()*options.length)];}
+  else{const top=options.filter(o=>o.score>=options[0].score-2);pick=top[Math.floor(Math.random()*Math.min(top.length,3))];}
+  selectedCell=[pick.fr,pick.fc];validMoves=getLegalMoves(pick.fr,pick.fc);renderBoard();
+  setTimeout(()=>doMove(pick.fr,pick.fc,pick.tr,pick.tc),380);
+}
+
+// ══════════════════════════════════════
+// SPAWN
+// ══════════════════════════════════════
+function spawnPawns(n,team,isMine=true){
+  const empties=[];
+  for(let r=1;r<7;r++)for(let c=0;c<8;c++)if(!board[r][c])empties.push([r,c]);
+  shuffle(empties);const spawned=Math.min(n,empties.length);
+  for(let i=0;i<spawned;i++){
+    const[r,c]=empties[i];board[r][c]=team+'P';
+    const k=`${r},${c}`;newPawnCells.add(k);spawnAnimCells.set(k,team);
+    if(opts.hp)pieceHP[k]=1;
+  }
+  renderBoard();
+  setTimeout(()=>{newPawnCells.clear();renderBoard();if(isMine)syncState();},3000);
+  return spawned;
+}
+function showSpawnInd(n,team){
+  const el=document.getElementById('spawn-indicator');
+  const cls=team==='w'?'si-w':'si-b',ic=team==='w'?'♙':'♟',nm=team==='w'?'Blancs':'Noirs';
+  el.style.display='flex';
+  el.innerHTML=`<div class="spawn-ind ${cls}">${ic} +${n} pion${n>1?'s':''} <b>${nm}</b> !</div>`;
+  setTimeout(()=>{el.style.display='none';el.innerHTML='';},3500);
+}
+
+// ══════════════════════════════════════
+// CHESS CLICK / MOVE
+// ══════════════════════════════════════
+function onCellClick(r,c){
+  if(waitingDraw||awaitingWild||awaitingMeteor)return;
+  if(isAITurn())return;
+  if(onlineConnected&&!isMyTurn()){setStatus('⏳ Tour adversaire.');return;}
+  const piece=board[r][c];
+  const opp=controlling==='w'?'b':'w';
+
+  // GEL: pick an enemy piece to freeze
+  if(awaitingGel){
+    if(piece&&piece[0]===opp&&!frozenCells.has(`${r},${c}`)){
+      if(onlineConnected&&myRole==='guest'){guestAction({type:'gel',r,c});return;}
+      frozenCells.add(`${r},${c}`);frozenTurns[`${r},${c}`]=2;
+      addLog(`❄️ ${PIECE_NAME[piece[1]]} en ${COL_LETTERS[c]}${8-r} gelé 2 tours !`,'gel');
+      awaitingGel=false;updateEffectStatus();renderBoard();syncState();
+      if(movesLeft>0){}else endTurn();
+    }
+    return;
+  }
+  // VOL: pick enemy piece, then move it
+  if(awaitingVol){
+    if(piece&&piece[0]===opp&&!frozenCells.has(`${r},${c}`)){
+      selectedCell=[r,c];validMoves=getLegalMoves(r,c);
+      awaitingVol=false;updateEffectStatus();
+      setStatus('🪄 Maintenant choisissez où déplacer la pièce volée !');
+      renderBoard();
+    } else if(selectedCell&&validMoves.some(([vr,vc])=>vr===r&&vc===c)){
+      doMove(selectedCell[0],selectedCell[1],r,c);
+    } else {selectedCell=null;validMoves=[];renderBoard();}
+    return;
+  }
+
+  if(movesLeft<=0)return;
+
+  if(piece&&piece[0]===controlling&&!frozenCells.has(`${r},${c}`)){
+    selectedCell=[r,c];validMoves=getLegalMoves(r,c);renderBoard();
+    if(!validMoves.length)setStatus('Pièce bloquée.');
+    return;
+  }
+  if(selectedCell&&validMoves.some(([vr,vc])=>vr===r&&vc===c)){doMove(selectedCell[0],selectedCell[1],r,c);return;}
+  selectedCell=null;validMoves=[];renderBoard();
+}
+
+function getLegalMoves(r,c){
+  const piece=board[r][c];if(!piece)return[];
+  const color=piece[0],type=piece[1],opp=color==='w'?'b':'w',moves=[];
+  const slide=(dr,dc)=>{let tr=r+dr,tc=c+dc;while(tr>=0&&tr<8&&tc>=0&&tc<8){const t=board[tr][tc];if(t){if(t[0]!==color)moves.push([tr,tc]);break;}moves.push([tr,tc]);tr+=dr;tc+=dc;}};
+  const jump=(dr,dc)=>{const tr=r+dr,tc=c+dc;if(tr<0||tr>7||tc<0||tc>7)return;if(!board[tr][tc]||board[tr][tc][0]!==color)moves.push([tr,tc]);};
+  switch(type){
+    case 'P':{const dir=color==='w'?-1:1,sR=color==='w'?6:1;if(r+dir>=0&&r+dir<8&&!board[r+dir][c])moves.push([r+dir,c]);if(r===sR&&!board[r+dir][c]&&!board[r+2*dir][c])moves.push([r+2*dir,c]);for(const dc of[-1,1]){const tc=c+dc,tr=r+dir;if(tc>=0&&tc<8&&board[tr]&&board[tr][tc]&&board[tr][tc][0]===opp)moves.push([tr,tc]);}break;}
+    case 'R':slide(1,0);slide(-1,0);slide(0,1);slide(0,-1);break;
+    case 'B':slide(1,1);slide(1,-1);slide(-1,1);slide(-1,-1);break;
+    case 'Q':slide(1,0);slide(-1,0);slide(0,1);slide(0,-1);slide(1,1);slide(1,-1);slide(-1,1);slide(-1,-1);break;
+    case 'N':for(const[dr,dc]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]])jump(dr,dc);break;
+    case 'K':for(const[dr,dc]of[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]])jump(dr,dc);break;
+  }
+  return moves;
+}
+
+function doMove(fr,fc,tr,tc,isVol=false){
+  // Guest sends move to host who executes and syncs back
+  if(onlineConnected&&myRole==='guest'&&!isVol){guestAction({type:'move',fr,fc,tr,tc});selectedCell=null;validMoves=[];renderBoard();return;}
+  const piece=board[fr][fc],captured=board[tr][tc];
+  const opp=controlling==='w'?'b':'w';
+
+  // SHIELD check
+  if(captured&&shieldedCell&&shieldedCell.r===tr&&shieldedCell.c===tc){
+    addLog(`🛡️ Bouclier ! La pièce est protégée !`,'sp');
+    shieldedCell=null;updateEffectStatus();
+    selectedCell=null;validMoves=[];movesLeft--;setCounter(movesLeft);renderBoard();syncState();
+    if(movesLeft<=0)endTurn();else if(isAITurn())scheduleAIMoves();
+    return;
+  }
+
+  // KING SHIELD check
+  if(captured&&captured[1]==='K'&&kingShielded[captured[0]]){
+    addLog(`👑 Bouclier Royal ! Le Roi résiste !`,'sp');
+    kingShielded[captured[0]]=false;
+    updateHPDisplay();
+    selectedCell=null;validMoves=[];movesLeft--;setCounter(movesLeft);renderBoard();syncState();
+    if(movesLeft<=0)endTurn();else if(isAITurn())scheduleAIMoves();
+    return;
+  }
+
+  // HP check for captures
+  if(captured&&opts.hp){
+    const tk=`${tr},${tc}`;
+    const hp=(pieceHP[tk]||1)-1;
+    if(hp>0){
+      // Piece survives but loses HP — attacker stays on its own square
+      pieceHP[tk]=hp;
+      addLog(`💥 ${PIECE_NAME[captured[1]]} touché ! ${hp} PV restant${hp>1?'s':''}.`,'cap');
+      selectedCell=null;validMoves=[];movesLeft--;setCounter(movesLeft);renderBoard();syncState();
+      if(movesLeft<=0)endTurn();else if(isAITurn())scheduleAIMoves();
+      return;
+    }
+    delete pieceHP[tk];
+  }
+
+  // Execute move
+  board[tr][tc]=piece;board[fr][fc]=null;
+  // Shield follows the piece if it moves
+  if(shieldedCell&&shieldedCell.r===fr&&shieldedCell.c===fc){
+    shieldedCell={r:tr,c:tc};
+  }
+  frozenCells.delete(`${fr},${fc}`);delete frozenTurns[`${fr},${fc}`];
+  if(opts.hp){const fk=`${fr},${fc}`,tk=`${tr},${tc}`;const prevHP=pieceHP[fk];delete pieceHP[fk];if(prevHP)pieceHP[tk]=prevHP;}
+  const fk=`${fr},${fc}`,tk=`${tr},${tc}`;
+  newPawnCells.delete(fk);spawnAnimCells.delete(fk);spawnAnimCells.delete(tk);
+  const from=COL_LETTERS[fc]+(8-fr),to=COL_LETTERS[tc]+(8-tr),pn=PIECE_NAME[piece[1]];
+
+  if(captured){
+    if(piece[0]==='w')capturedByWhite.push(captured);else capturedByBlack.push(captured);
+    updateCaptureDisplay();
+    addLog(`${pn} ${from}→${to} capture ${PIECE_NAME[captured[1]]} !`,'cap');
+    // Challenge tracking
+    if(gameMode==='defi'&&piece[0]===soloTeam){
+      updateChallenge('capture');
+      if(captured[1]==='Q')updateChallenge('captureQ');
+      if(captured[1]==='N')updateChallenge('captureN');
+    }
+    if(captured[1]==='K'){renderBoard();syncState();const w=isVol?playerNames[controlling]:controlling==='w'?playerNames.w:playerNames.b;showEndGame(w);if(onlineConnected)sendOnline({type:'gameover',winner:w});return;}
+  } else {addLog(`${pn} ${from}→${to}`);}
+
+  // PROMOTION
+  if(opts.promo){
+    if(piece[1]==='P'&&tr===0&&piece[0]==='w'){board[tr][tc]='wQ';if(opts.hp)pieceHP[`${tr},${tc}`]=MAX_HP['Q'];addLog(`♙→♕ Promotion !`,'sp');if(gameMode==='defi'&&piece[0]===soloTeam)updateChallenge('promo');}
+    if(piece[1]==='P'&&tr===7&&piece[0]==='b'){board[tr][tc]='bQ';if(opts.hp)pieceHP[`${tr},${tc}`]=MAX_HP['Q'];addLog(`♟→♛ Promotion !`,'sp');if(gameMode==='defi'&&piece[0]===soloTeam)updateChallenge('promo');}
+  }
+
+  // ZONE EFFECTS
+  const landKey=`${tr},${tc}`;
+  if(specialZones.boosts.has(landKey)){
+    movesLeft++;setCounter(movesLeft);addLog(`⚡ Boost ! +1 coup bonus !`,'zone');
+  }
+
+  selectedCell=null;validMoves=[];movesLeft--;setCounter(movesLeft);renderBoard();syncState();
+  if(movesLeft<=0)endTurn();else if(isAITurn())scheduleAIMoves();
+}
+
+function endTurn(skipNext=false){
+  movesLeft=0;selectedCell=null;validMoves=[];waitingDraw=true;currentCard=null;
+  awaitingSwap=false;swapFirst=null;
+  awaitingGel=false;awaitingVol=false;awaitingMeteor=false;
+  // NOTE: shieldedCell is NOT cleared here — it persists until the piece is attacked
+  // Decrement frozen turns; unfreeze pieces that have thawed
+  for(const key of [...frozenCells]){
+    frozenTurns[key]=(frozenTurns[key]||1)-1;
+    if(frozenTurns[key]<=0){frozenCells.delete(key);delete frozenTurns[key];}
+  }
+  selectedHandIdx=-1;
+  drawnThisTurn=false;
+  // Reset draw button appearance
+  const btn=document.getElementById('draw-pass-btn');
+  if(btn){btn.textContent='🃏 Piocher';btn.style.background='rgba(255,180,194,.15)';btn.style.color='var(--muted)';}
+  updateEffectStatus();
+  stopBlitz();
+  // REGEN ZONES
+  if(opts.zones&&opts.hp&&opts.regen){
+    specialZones.regens.forEach(key=>{
+      const [rr,rc]=key.split(',').map(Number);
+      const p=board[rr][rc];
+      if(p){
+        const maxH=MAX_HP[p[1]]||1;
+        const cur=pieceHP[key]||maxH;
+        if(cur<maxH){pieceHP[key]=cur+1;addLog(`💚 ${PIECE_NAME[p[1]]} régénère 1 PV en ${COL_LETTERS[rc]}${8-rr} !`,'zone');}
+      }
+    });
+  }
+  setCounter(0);renderBoard();addLog('— Fin du tour —','dim');
+  const prevControlling=controlling;
+  controlling=controlling==='w'?'b':'w';
+  // Apply pending wild color constraint for the new current player (opponent of who played Wild)
+  if(window._pendingWildColor){requiredColor=window._pendingWildColor;window._pendingWildColor=null;}
+  // Apply pending color constraint from the card just played (non-wild colored card)
+  else if(window._pendingRequiredColor){requiredColor=window._pendingRequiredColor;window._pendingRequiredColor=null;}
+  else{requiredColor=null;}
+  // Replenish new current player's hand
+  replenishHand();
+  // SURVIVAL
+  if(gameMode==='survie'&&controlling==='b'){
+    survivalTurns++;survivalWave=Math.ceil(survivalTurns/3);
+    const waveSize=Math.min(3+survivalWave,8);
+    addLog(`⏱️ Vague ${survivalWave} ! ${waveSize} pions envahissent !`,'sp');
+    spawnPawns(waveSize,'b',true);
+    document.getElementById('survival-wave-label').textContent=`Vague ${survivalWave}`;
+    document.getElementById('survival-turns').textContent=survivalTurns;
+  }
+  // DEFI
+  if(gameMode==='defi'&&prevControlling===soloTeam){updateChallenge('render');}
+  updateTurnUI();updateBanners();renderBoard();
+  // Sync AFTER controlling switch so opponent receives correct turn
+  syncState();
+  if(skipNext){
+    // This turn is being skipped (Skip/Reverse card) — just show status, no play triggered
+    const skippedName=controlling==='w'?playerNames.w:playerNames.b;
+    setStatus(`⏭ Tour de ${skippedName} passé (Skip) !`);
+    return;
+  }
+  if(gameMode==='local'){btnEnabled(false);setStatus('Passage de tour...');setTimeout(()=>showPassScreen(),400);}
+  else if(isAITurn()){
+    setStatus('🤖 Tour de l\'IA...');btnEnabled(false);
+    if(stackTotal>0){
+      document.getElementById('ai-thinking').classList.add('on');
+      setTimeout(()=>{document.getElementById('ai-thinking').classList.remove('on');aiPlayFromHand();},900);
+    } else {
+      scheduleAI(800);
+    }
+  }
+  else if(onlineConnected){
+    if(isMyTurn()){setStatus('🃏 Choisissez une carte !');btnEnabled(true);renderHand();startBlitz();}
+    else{setStatus('⏳ Tour adversaire...');btnEnabled(false);}
+  }
+  else{setStatus('🃏 Choisissez une carte à jouer !');btnEnabled(true);renderHand();startBlitz();}
+}
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function findKingPos(color){for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(board[r][c]===color+'K')return[r,c];return null;}
+function isKingInCheck(color){
+  const kp=findKingPos(color);if(!kp)return false;
+  const opp=color==='w'?'b':'w';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    if(board[r][c]&&board[r][c][0]===opp){const moves=getLegalMoves(r,c);if(moves.some(([mr,mc])=>mr===kp[0]&&mc===kp[1]))return true;}
+  }
+  return false;
+}
+function renderBoard(){
+  const el=document.getElementById('board');el.innerHTML='';
+  const flipped=getBoardFlipped();
+  buildCoords(); // remet les coordonnées dans le bon sens
+  const wCheck=isKingInCheck('w'),bCheck=isKingInCheck('b');
+  const wKp=wCheck?findKingPos('w'):null,bKp=bCheck?findKingPos('b'):null;
+  for(let ri=0;ri<8;ri++)for(let ci=0;ci<8;ci++){
+    // ri/ci = indices d'affichage ; r/c = indices réels dans board[][]
+    const r=flipped?7-ri:ri;
+    const c=flipped?7-ci:ci;
+    const cell=document.createElement('div');
+    const key=`${r},${c}`;
+    let cls=`cell ${(r+c)%2===0?'light':'dark'}`;
+    const piece=board[r][c],isNew=newPawnCells.has(key),spTeam=spawnAnimCells.get(key);
+    if(isNew&&spTeam)cls+=spTeam==='w'?' spawn-w':' spawn-b';
+    else if(spTeam&&!isNew)cls+=spTeam==='w'?' glow-w':' glow-b';
+    // Zones
+    if(specialZones.traps.has(key))cls+=' zone-trap';
+    if(specialZones.boosts.has(key))cls+=' zone-boost';
+    if(specialZones.regens.has(key))cls+=' zone-regen';
+    // Shield / check
+    if(shieldedCell&&shieldedCell.r===r&&shieldedCell.c===c)cls+=' shielded';
+    if(wKp&&wKp[0]===r&&wKp[1]===c)cls+=' in-check';
+    if(bKp&&bKp[0]===r&&bKp[1]===c)cls+=' in-check';
+    if(piece){
+      const sp=document.createElement('span');
+      // Ghost mode: hide enemy pieces
+      const enemyColor=soloTeam==='w'?'b':'w';
+      const isGhost=ghostMode&&piece[0]===enemyColor&&gameMode==='fantome';
+      sp.className=`piece piece-${piece[0]}`+(isNew?' is-new':'')+(isGhost?' ghost-hidden':'');
+      sp.textContent=GLYPH[piece]||'?';
+      if(frozenCells.has(key)){sp.classList.add('frozen');
+        // Show remaining freeze turns
+        const ft=frozenTurns[key]||0;
+        if(ft>0){const fnum=document.createElement('span');fnum.style.cssText='position:absolute;bottom:1px;left:1px;font-size:0.38em;z-index:4;background:rgba(72,202,228,.9);color:#003d5c;border-radius:3px;padding:0 2px;font-weight:900;';fnum.textContent='❄'+ft;cell.appendChild(fnum);}
+      }
+      // HP mini-bar
+      if(opts.hp&&pieceHP[key]!==undefined){
+        const maxH=MAX_HP[piece[1]]||1,curH=pieceHP[key];
+        if(maxH>1&&curH<maxH){
+          const bar=document.createElement('div');
+          bar.style.cssText=`position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:70%;height:3px;background:rgba(0,0,0,.2);border-radius:2px;z-index:3;`;
+          const fill=document.createElement('div');
+          fill.style.cssText=`height:100%;border-radius:2px;width:${(curH/maxH)*100}%;background:${curH===1?'#FF4D6D':curH===maxH-1?'#FFBE0B':'#06D6A0'};`;
+          bar.appendChild(fill);cell.appendChild(bar);
+        }
+      }
+      // Shield overlay
+      if(shieldedCell&&shieldedCell.r===r&&shieldedCell.c===c){const sh=document.createElement('span');sh.style.cssText='position:absolute;top:1px;right:1px;font-size:0.42em;z-index:3;';sh.textContent='🛡️';cell.appendChild(sh);}
+      // King shield overlay
+      if(piece[1]==='K'&&kingShielded[piece[0]]){const sh=document.createElement('span');sh.style.cssText='position:absolute;top:1px;right:1px;font-size:0.42em;z-index:3;';sh.textContent='👑';cell.appendChild(sh);}
+      // Zone icons
+      if(specialZones.traps.has(key)){const zi=document.createElement('span');zi.className='zone-icon';zi.textContent='💥';cell.appendChild(zi);}
+      else if(specialZones.boosts.has(key)){const zi=document.createElement('span');zi.className='zone-icon';zi.textContent='⚡';cell.appendChild(zi);}
+      else if(specialZones.regens.has(key)){const zi=document.createElement('span');zi.className='zone-icon';zi.textContent='💚';cell.appendChild(zi);}
+      cell.appendChild(sp);
+    } else {
+      if(specialZones.traps.has(key)){const zi=document.createElement('span');zi.className='zone-icon';zi.textContent='💥';cell.appendChild(zi);}
+      else if(specialZones.boosts.has(key)){const zi=document.createElement('span');zi.className='zone-icon';zi.textContent='⚡';cell.appendChild(zi);}
+      else if(specialZones.regens.has(key)){const zi=document.createElement('span');zi.className='zone-icon';zi.textContent='💚';cell.appendChild(zi);}
+    }
+    if(selectedCell&&selectedCell[0]===r&&selectedCell[1]===c)cls+=' selected';
+    if(validMoves.some(([vr,vc])=>vr===r&&vc===c))cls+=board[r][c]&&board[r][c][0]!==controlling?' vc':' vm';
+    cell.className=cls;cell.onclick=()=>onCellClick(r,c);el.appendChild(cell);
+  }
+}
+
+// ══════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════
+function buildCoords(){
+  const flipped=getBoardFlipped();
+  ['coord-top','coord-bot'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.innerHTML='<div style="width:15px"></div>';
+    for(let i=0;i<8;i++){
+      const d=document.createElement('div');d.className='clbl';
+      d.textContent=COL_LETTERS[flipped?7-i:i];el.appendChild(d);
+    }
+  });
+  ['coord-left','coord-right'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.innerHTML='';
+    for(let i=0;i<8;i++){
+      const d=document.createElement('div');d.className='rlbl';
+      d.textContent=flipped?i+1:8-i;el.appendChild(d);
+    }
+  });
+}
+
+// Retourne true si le plateau doit être affiché du côté des noirs (mes pions en bas)
+function getBoardFlipped(){
+  if(onlineConnected) return myRole==='guest'; // guest joue toujours les noirs
+  // Solo / local : on regarde quel camp le joueur humain contrôle actuellement
+  if(soloTeam==='local1v1') return false; // local 1v1 : jamais flippé (écran de passage)
+  return soloTeam==='b'; // solo ou autres modes
+}
+function updateTurnUI(){
+  document.getElementById('tdot').className='tdot '+(controlling==='w'?'w':'b');
+  document.getElementById('ttext').textContent=controlling==='w'?playerNames.w:playerNames.b;
+  document.getElementById('turn-box').className='turn-box '+(controlling==='w'?'tw':'tb');
+}
+function updateBanners(){
+  document.getElementById('bname-top').textContent=playerNames.b;
+  document.getElementById('bname-bot').textContent=playerNames.w;
+  const ba=controlling==='b';
+  document.getElementById('banner-top').classList.toggle('pactive',ba);
+  document.getElementById('banner-bot').classList.toggle('pactive',!ba);
+  const aiModes=['solo','ko','defi','chaos','survie','fantome'];
+  const humanPlayingBlack=(aiModes.includes(gameMode)&&soloTeam==='b')||(gameMode==='local')||(onlineConnected&&myRole==='guest')||(soloTeam==='local1v1');
+  const humanPlayingWhite=(aiModes.includes(gameMode)&&soloTeam==='w')||(gameMode==='local')||(onlineConnected&&myRole==='host')||(soloTeam==='local1v1');
+  document.getElementById('btag-top').style.display=(ba&&humanPlayingBlack&&!isAITurn())?'inline':'none';
+  document.getElementById('btag-bot').style.display=(!ba&&humanPlayingWhite&&!isAITurn())?'inline':'none';
+}
+function updateHPDisplay(){
+  // Show king shield status in banners as pip bars
+  ['w','b'].forEach(color=>{
+    const el=document.getElementById(color==='b'?'hp-top':'hp-bot');
+    el.innerHTML='';
+    if(opts['king-shield']){
+      const pip=document.createElement('span');
+      pip.style.cssText=`font-size:.6rem;${kingShielded[color]?'opacity:1':'opacity:.25'}`;
+      pip.textContent='👑';
+      el.appendChild(pip);
+    }
+  });
+}
+function updateCaptureDisplay(){
+  const pieceGlyph=(p)=>GLYPH[p]||'?';
+  const scoreOf=(list)=>list.reduce((s,p)=>s+(PIECE_VALUE[p[1]]||0),0);
+  document.getElementById('cap-by-white').innerHTML=capturedByWhite.map(p=>`<span title="${PIECE_NAME[p[1]]}">${pieceGlyph(p)}</span>`).join('');
+  document.getElementById('cap-by-black').innerHTML=capturedByBlack.map(p=>`<span title="${PIECE_NAME[p[1]]}">${pieceGlyph(p)}</span>`).join('');
+  document.getElementById('score-w').textContent=scoreOf(capturedByWhite);
+  document.getElementById('score-b').textContent=scoreOf(capturedByBlack);
+}
+function updateEffectStatus(){
+  const el=document.getElementById('effect-status');
+  const badges=[];
+  if(shieldedCell){const p=board[shieldedCell.r]?.[shieldedCell.c];badges.push(`<span class="shield-badge">🛡️ ${p?PIECE_NAME[p[1]]:'?'} protégé</span>`);}
+  if(awaitingGel)badges.push(`<span class="gel-badge">❄️ Cliquez une pièce à geler</span>`);
+  if(awaitingVol)badges.push(`<span class="gel-badge">🪄 Cliquez une pièce à voler</span>`);
+  el.style.display=badges.length?'block':'none';
+  el.innerHTML=badges.join(' ');
+}
+function setCounter(n){document.getElementById('mcounter').textContent=n>=0?n:'–';document.getElementById('mlabel').textContent=n>0?'coup(s) restant(s)':n===0?'Tirez une carte':'';}
+function setStatus(msg){document.getElementById('status').textContent=msg;}
+function btnEnabled(on){document.getElementById('draw-btn').disabled=!on;}
+function updateDeckInfo(){document.getElementById('deck-info').textContent=deck.length+' cartes restantes';}
+function addLog(msg,cls=''){const log=document.getElementById('log');const el=document.createElement('div');el.className='le '+(cls||'');el.textContent=msg;log.appendChild(el);log.scrollTop=log.scrollHeight;}
+
+function updateDiscardDisplay(){
+  const el=document.getElementById('discard-top');
+  if(!el)return;
+  if(!discardPile.length){el.innerHTML='<span style="font-size:.6rem;color:var(--muted);">Aucune carte</span>';return;}
+  const card=discardPile[discardPile.length-1];
+  const cm={red:'c-red',blue:'c-blue',green:'c-green',yellow:'c-yellow',wild:'c-wild',shield:'c-shield',swap:'c-swap',res:'c-res',gel:'c-gel',vol:'c-vol',meteor:'c-meteor'};
+  const lb={Skip:'⏭','⇄':'⇄','+2':'+2',Wild:'★','+4':'+4','🛡️':'🛡️','🔀':'🔀','✨':'✨','❄️':'❄️','🪄':'🪄','☄️':'☄️'};
+  el.innerHTML=`<div class="uno-card ${cm[card.color]||'c-wild'}" style="width:52px;height:76px;animation:none;"><span class="cv" style="font-size:1.3rem;">${lb[card.value]||card.value}</span><span class="cs">${['wild','shield','swap','res','gel','vol','meteor'].includes(card.color)?card.value:card.color}</span></div>`;
+}
+
+function showEndGameCards(winner){
+  aiPaused=true;stopBlitz();launchConfetti();
+  document.getElementById('ai-thinking').classList.remove('on');
+  document.getElementById('m-title').textContent='🃏 UNO CHESS !';
+  document.getElementById('m-body').textContent=`${winner} a vidé sa main !\nVictoire UNO !`;
+  document.getElementById('modal').classList.add('on');
+}
+function displayCard(card){
+  const cm={red:'c-red',blue:'c-blue',green:'c-green',yellow:'c-yellow',wild:'c-wild',shield:'c-shield',swap:'c-swap',res:'c-res',gel:'c-gel',vol:'c-vol',meteor:'c-meteor'};
+  const lb={Skip:'⏭','⇄':'⇄','+2':'+2',Wild:'★','+4':'+4','🛡️':'🛡️','🔀':'🔀','✨':'✨','❄️':'❄️','🪄':'🪄','☄️':'☄️'};
+  document.getElementById('card-display').innerHTML=`<div class="uno-card ${cm[card.color]||'c-wild'}"><span class="cv">${lb[card.value]||card.value}</span><span class="cs">${['wild','shield','swap','res','gel','vol','meteor'].includes(card.color)?card.value:card.color}</span></div>`;
+}
+
+// ══════════════════════════════════════
+// END GAME
+// ══════════════════════════════════════
+function launchConfetti(){
+  const colors=['#FF4D6D','#FFBE0B','#06D6A0','#FF8FA3','#48CAE4','#C77DFF','#80ED99','#FFE66D'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');el.className='confetti-piece';
+    el.style.left=Math.random()*100+'vw';el.style.top='-20px';
+    el.style.background=colors[Math.floor(Math.random()*colors.length)];
+    el.style.width=(6+Math.random()*10)+'px';el.style.height=(6+Math.random()*10)+'px';
+    el.style.animationDelay=(Math.random()*1.5)+'s';el.style.animationDuration=(2+Math.random()*2)+'s';
+    document.body.appendChild(el);setTimeout(()=>el.remove(),5000);
+  }
+}
+function showEndGame(winner){
+  aiPaused=true;stopBlitz();launchConfetti();
+  document.getElementById('ai-thinking').classList.remove('on');
+  document.getElementById('m-title').textContent='🏆 Victoire !';
+  const wScore=capturedByWhite.reduce((s,p)=>s+(PIECE_VALUE[p[1]]||0),0);
+  const bScore=capturedByBlack.reduce((s,p)=>s+(PIECE_VALUE[p[1]]||0),0);
+  let body=`${winner} a capturé le Roi adverse !\nScore Blancs: ${wScore} pts | Noirs: ${bScore} pts`;
+  if(gameMode==='survie')body+=`\n⏱️ Tours survivus : ${survivalTurns} | Vague ${survivalWave}`;
+  if(gameMode==='defi')body+=`\n🎯 Points défi : ${challengeScore}`;
+  document.getElementById('m-body').textContent=body;
+  document.getElementById('modal').classList.add('on');
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+// ══════════════════════════════════════
+// TUTORIAL SYSTEM
+// ══════════════════════════════════════
+const TUTO_PAGES=[
+  {
+    title:'🎯 Concept du jeu',
+    html:`<div class="tuto-intro"><b>UNO Chess</b> fusionne deux jeux iconiques :<br>
+    • Les <b>Échecs</b> : pièces, plateau 8×8, stratégie<br>
+    • <b>UNO</b> : main de cartes colorées, contraintes de couleur<br><br>
+    Chaque tour, tu joues <b>une carte</b> de ta main de 7 cartes.<br>
+    Cette carte te donne un <b>nombre de coups</b> à faire aux échecs.</div>
+    <div class="tuto-hl tuto-hl-pink">🏆 <b>Objectif :</b> capturer le Roi adverse ! (pas d'échec et mat — on capture directement)</div>
+    <div class="tuto-hl tuto-hl-blue">♟️ Les règles de déplacement des pièces sont celles des échecs classiques.</div>`
+  },
+  {
+    title:'⏱️ Déroulement d\'un tour',
+    html:`<div class="tuto-steps-list">
+    <div class="tuto-step-item"><div class="tuto-step-num">1</div><div class="tuto-step-txt"><b>Choisis une carte</b> dans ta main en cliquant dessus. Elle monte pour indiquer ta sélection.</div></div>
+    <div class="tuto-step-item"><div class="tuto-step-num">2</div><div class="tuto-step-txt">Le compteur affiche ton <b>nombre de coups</b> à jouer (ex. : carte 5 → 5 coups).</div></div>
+    <div class="tuto-step-item"><div class="tuto-step-num">3</div><div class="tuto-step-txt"><b>Clique une de tes pièces</b> sur l'échiquier — les cases valides s'affichent en vert (déplacement) ou rouge (capture).</div></div>
+    <div class="tuto-step-item"><div class="tuto-step-num">4</div><div class="tuto-step-txt"><b>Clique une case valide</b> pour jouer le coup. Le compteur descend à chaque coup.</div></div>
+    <div class="tuto-step-item"><div class="tuto-step-num">5</div><div class="tuto-step-txt">Quand le compteur atteint 0, <b>le tour passe automatiquement</b> à l'adversaire.</div></div>
+    </div>
+    <div class="tuto-hl tuto-hl-yellow">🃏 Si tu n'as pas de carte jouable, clique <b>🃏 Piocher</b> pour tirer 1 carte, puis <b>Passer</b>.</div>`
+  },
+  {
+    title:'🎨 La contrainte de couleur',
+    html:`<div class="tuto-intro">C'est la règle UNO la plus importante ! Chaque carte jouée <b>impose une couleur</b> à l'adversaire.</div>
+    <div class="tuto-steps-list">
+    <div class="tuto-step-item"><div class="tuto-step-num" style="background:#C9002E">🔴</div><div class="tuto-step-txt">Tu joues un <b>6 Rouge</b> → ton adversaire doit jouer une carte <b>Rouge</b> à son prochain tour.</div></div>
+    <div class="tuto-step-item"><div class="tuto-step-num" style="background:#0066CC">🔵</div><div class="tuto-step-txt">Si l'adversaire n'a pas de carte de la bonne couleur → il <b>pioche 1 carte</b> et passe son tour.</div></div>
+    <div class="tuto-step-item"><div class="tuto-step-num" style="background:#7B3FA0">🌈</div><div class="tuto-step-txt">Les cartes <b>Wild</b> et cartes spéciales (Bouclier, Gel…) <b>ne sont pas bloquées</b> par la contrainte.</div></div>
+    </div>
+    <div class="tuto-hl tuto-hl-pink">⚠️ La contrainte ne s'applique qu'au <b>début du tour</b> (avant de jouer une carte). Si tu joues plusieurs cartes en un tour, seule la dernière impose la couleur pour l'adversaire.</div>`
+  },
+  {
+    title:'🃏 Les cartes numériques & Skip',
+    html:`<div class="tuto-cards-grid">
+    <div class="tuto-card tc-yellow"><b>🔢 0</b>Carte 0 = 0 coup. Tu passes ton tour mais imposes ta couleur !</div>
+    <div class="tuto-card tc-red"><b>🔢 1–9</b>La valeur = le nombre <b>exact</b> de coups aux échecs. Carte 6 = 6 coups.</div>
+    <div class="tuto-card tc-blue"><b>⏭ Skip</b>L'adversaire passe son tour. Tu ne joues pas de coup non plus.</div>
+    <div class="tuto-card tc-green"><b>🔄 Reverse</b>À 2 joueurs = Skip. L'adversaire passe.</div>
+    <div class="tuto-card tc-wild"><b>➕2</b>Adversaire pioche 2 cartes. Toi tu reçois <b>2 pions bonus</b> sur le plateau + 1 coup.</div>
+    <div class="tuto-card tc-wild"><b>🌈 Wild</b>Choisis quelle équipe tu contrôles (Blancs ou Noirs) + impose une couleur.</div>
+    <div class="tuto-card tc-wild"><b>🌈 +4</b>Adversaire pioche 4. Toi 4 pions bonus. + Wild.</div>
+    </div>
+    <div class="tuto-hl tuto-hl-green">💡 Les cartes <b>Skip, Reverse, +2</b> ont une couleur et respectent la contrainte de couleur.</div>`
+  },
+  {
+    title:'⚔️ Cartes spéciales',
+    html:`<div class="tuto-cards-grid">
+    <div class="tuto-card tc-special"><b>🛡️ Bouclier</b>Clique une de tes pièces — la prochaine attaque est annulée.</div>
+    <div class="tuto-card tc-special"><b>🔀 Échange</b>Deux de tes pions échangent leur position.</div>
+    <div class="tuto-card tc-special"><b>✨ Résurrection</b>Ramène ta pièce capturée la plus précieuse sur une case vide.</div>
+    <div class="tuto-card tc-special"><b>❄️ Gel</b>Gèle une pièce adverse — elle ne peut plus bouger pendant <b>2 tours</b>.</div>
+    <div class="tuto-card tc-special"><b>🪄 Vol</b>Joue 1 coup avec <b>une pièce adverse</b> de ton choix.</div>
+    <div class="tuto-card tc-special"><b>☄️ Météore</b>Choisis une colonne A–H : <b>toutes les pièces</b> dessus sont détruites !</div>
+    </div>
+    <div class="tuto-hl tuto-hl-blue">🛡️ Les cartes spéciales ne sont <b>pas bloquées</b> par la contrainte de couleur — elles passent toujours !</div>`
+  },
+  {
+    title:'💡 Conseils & Points de vie',
+    html:`<div class="tuto-intro">Avec les <b>points de vie activés</b> (option par défaut) :</div>
+    <div class="tuto-steps-list">
+    <div class="tuto-step-item"><div class="tuto-step-num" style="background:#06D6A0;font-size:.75rem;">1PV</div><div class="tuto-step-txt"><b>Pion</b> — 1 PV, éliminé au 1er coup.</div></div>
+    <div class="tuto-step-item"><div class="tuto-step-num" style="background:#FFBE0B;font-size:.7rem;color:#333;">2PV</div><div class="tuto-step-txt"><b>Cavalier / Fou / Tour</b> — 2 PV, encaisse 1 coup avant de mourir.</div></div>
+    <div class="tuto-step-item"><div class="tuto-step-num" style="background:#FF4D6D;font-size:.7rem;">3PV</div><div class="tuto-step-txt"><b>Dame / Roi</b> — 3 PV, très résistants.</div></div>
+    </div>
+    <div class="tuto-hl tuto-hl-yellow">🏆 <b>Conseils :</b><br>• Protège ton Roi — sa capture = game over immédiat<br>• Garde une carte Wild pour changer d'équipe en urgence<br>• Utilise le Gel sur la Dame adverse<br>• Les cartes 7-8-9 sont puissantes — garde-les pour les offensives</div>
+    <div class="tuto-hl tuto-hl-green">🎮 Tu es prêt ! Lance une partie Solo vs IA en mode Facile pour t'entraîner.</div>`
+  }
+];
+
+let tutoPage=0;
+function openTuto(){tutoPage=0;renderTuto();document.getElementById('tuto-ov').classList.add('on');}
+function closeTuto(){document.getElementById('tuto-ov').classList.remove('on');}
+function tutoNav(dir){tutoPage=Math.max(0,Math.min(TUTO_PAGES.length-1,tutoPage+dir));renderTuto();}
+function renderTuto(){
+  const n=TUTO_PAGES.length;
+  const bar=document.getElementById('tuto-steps-bar');
+  bar.innerHTML=TUTO_PAGES.map((_,i)=>`<div class="tuto-step ${i<tutoPage?'done':i===tutoPage?'active':''}" onclick="tutoPage=${i};renderTuto()"></div>`).join('');
+  const p=TUTO_PAGES[tutoPage];
+  const cnt=document.getElementById('tuto-content');
+  cnt.innerHTML=`<div class="tuto-page active"><div class="tuto-page-title">${p.title}</div>${p.html}</div>`;
+  document.getElementById('tuto-counter').textContent=`${tutoPage+1} / ${n}`;
+  document.getElementById('tuto-prev').style.visibility=tutoPage===0?'hidden':'visible';
+  const nextBtn=document.getElementById('tuto-next');
+  if(tutoPage===n-1){nextBtn.textContent='✓ Terminer';nextBtn.onclick=closeTuto;}
+  else{nextBtn.textContent='Suivant →';nextBtn.onclick=()=>tutoNav(1);}
+}
+
+// ══════════════════════════════════════
+// VISUAL EFFECTS — capture flash & move land
+// ══════════════════════════════════════
+function flashCell(r,c,cls){
+  const board=document.getElementById('board');
+  if(!board)return;
+  const cells=board.querySelectorAll('.cell');
+  const idx=r*8+c;
+  if(cells[idx]){cells[idx].classList.add(cls);setTimeout(()=>cells[idx].classList.remove(cls),600);}
+}
+
+selectPlayType('solo');buildCoords();
+</script>
+</body>
+</html>
